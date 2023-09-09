@@ -1,3 +1,8 @@
+import './global.css';
+
+import Providers from '@/providers';
+import { WrapperPage } from '@/components/WrapperPage';
+
 export default function RootLayout({
   children
 }: {
@@ -5,7 +10,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-Br">
-      <body>{children}</body>
+      <body>
+        <Providers>
+          <WrapperPage>{children}</WrapperPage>
+        </Providers>
+      </body>
     </html>
   );
 }

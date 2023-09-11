@@ -1,3 +1,5 @@
+'use client';
+
 import styled from 'styled-components';
 
 export const Container = styled.div`
@@ -9,7 +11,11 @@ export const Container = styled.div`
   cursor: pointer;
 `;
 
-export const WrapperTitle = styled.div`
+type WrapperTitleProps = {
+  show: boolean;
+};
+
+export const WrapperTitle = styled.div<WrapperTitleProps>`
   padding: 10px;
   min-height: 90px;
   max-height: 90px;
@@ -31,7 +37,11 @@ export const WrapperTitle = styled.div`
   `}
 `;
 
-export const Title = styled.h2`
+type TitleProps = {
+  show: boolean;
+};
+
+export const Title = styled.h2<TitleProps>`
   color: ${({ theme, show }) =>
     show ? theme.COLORS.BLUE[200] : theme.COLORS.WHITE[900]};
   font-size: 22px;
@@ -39,7 +49,11 @@ export const Title = styled.h2`
   transition: all ease-in-out 0.5s;
 `;
 
-export const WrapperContent = styled.div`
+type WrapperContentProps = {
+  show: boolean;
+};
+
+export const WrapperContent = styled.div<WrapperContentProps>`
   border-top: 1px ${({ theme }) => theme.COLORS.WHITE[900]} solid;
   position: relative;
   overflow: hidden;
@@ -54,7 +68,12 @@ export const WrapperContent = styled.div`
   `}
 `;
 
-export const Image = styled.div`
+type ImageProps = {
+  image: string;
+  show: boolean;
+};
+
+export const Image = styled.div<ImageProps>`
   width: 100%;
   display: block;
   background: ${({ image }) => image && `url(${image})`};

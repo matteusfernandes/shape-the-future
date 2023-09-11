@@ -1,4 +1,9 @@
+'use client';
+
+import { useCallback, useState } from 'react';
+import _ from 'lodash';
 import { usePathname } from 'next/navigation';
+
 import { AuthButton } from '../AuthButton';
 import { Logo } from '../Logo';
 import {
@@ -12,9 +17,6 @@ import {
   MenuClose,
   MyLink
 } from './style';
-
-import { useCallback, useState } from 'react';
-import _ from 'lodash';
 
 export function Navbar() {
   const logged = false;
@@ -57,11 +59,11 @@ export function Navbar() {
   // }, []);
 
   const isActive = useCallback(
-    (path: string) => {
-      const rest = { className: '', href: path };
+    (path: string, otherClass: string = '') => {
+      const rest = { className: ` ${otherClass}`, href: path };
 
       return _.isEqual(pathname, path)
-        ? { ...rest, className: 'active' }
+        ? { ...rest, className: `active ${otherClass}` }
         : rest;
     },
     [pathname]
@@ -76,12 +78,13 @@ export function Navbar() {
         <MyLink {...isActive('/')}>Home</MyLink>
       )}
 
-      <MyLink href="/timeline" className="left">
-        Cronograma
-      </MyLink>
+      <MyLink {...isActive('/timeline', 'left')}>Cronograma</MyLink>
+
       <Logo />
-      <MyLink href="/finalists">Finalistas</MyLink>
-      <AuthButton />
+
+      <MyLink {...isActive('/finalists')}>Finalistas</MyLink>
+
+      <AuthButton {...isActive('/signin', 'left')} />
 
       <ContentMobile>
         <ContentMobileRoute>Home</ContentMobileRoute>
@@ -99,12 +102,14 @@ export function Navbar() {
           ) : (
             <MyLink href="/">Home</MyLink>
           )}
-          <MyLink href="/timeline" className="left">
-            Cronograma
-          </MyLink>
+
+          <MyLink {...isActive('/timeline', 'left')}>Cronograma</MyLink>
+
           <Logo />
-          <MyLink href="/finalists">Finalistas</MyLink>
-          <AuthButton />
+
+          <MyLink {...isActive('/finalists')}>Finalistas</MyLink>
+
+          <AuthButton {...isActive('/signin', 'left')} />
         </ContentMenu>
       </Menu>
 

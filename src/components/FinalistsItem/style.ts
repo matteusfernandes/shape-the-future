@@ -117,3 +117,17 @@ export const Finalist = styled.h3`
       font-weight: 700;
     `}
 `;
+
+export const Select = styled.div`
+  border: 3px #ccc solid;
+  min-height: 25px;
+  min-width: 25px;
+  margin-right: 10px;
+  cursor: pointer;
+
+  ${({ active }) =>
+    active &&
+    `
+  background: #fff;
+  `}
+`;

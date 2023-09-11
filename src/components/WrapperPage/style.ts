@@ -1,3 +1,5 @@
+'use client';
+
 import styled from 'styled-components';
 
 export const Container = styled.div`
@@ -6,6 +8,7 @@ export const Container = styled.div`
   flex-flow: column nowrap;
   margin: 80px auto;
   max-width: 1210px;
+  min-height: 670px;
 
   @media (max-width: 585px) {
     margin: 0 auto;

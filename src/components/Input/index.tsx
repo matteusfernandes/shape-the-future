@@ -1,6 +1,12 @@
 import { Container, InputText, Label, SelectText } from './style';
 
-export function Input({ label, select, children, ...props }) {
+type InputProps = {
+  label?: string;
+  select?: boolean;
+  children?: React.ReactNode;
+};
+
+export function Input({ label, select, children, ...props }: InputProps) {
   return (
     <Container>
       {label && <Label>{label}</Label>}

@@ -1,6 +1,9 @@
+import { AnchorHTMLAttributes } from 'react';
 import { MyLink } from '../Navbar/style';
 
-export function AuthButton() {
+type AuthButtonProps = AnchorHTMLAttributes<HTMLAnchorElement>;
+
+export function AuthButton({ ...rest }: AuthButtonProps) {
   const logged = false;
 
   return logged ? (
@@ -14,8 +17,6 @@ export function AuthButton() {
       Sair
     </MyLink>
   ) : (
-    <MyLink href="/signin" className="left">
-      Login
-    </MyLink>
+    <MyLink {...rest}>Login</MyLink>
   );
 }

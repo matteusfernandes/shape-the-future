@@ -1,3 +1,4 @@
+import { useState, useMemo } from 'react';
 import {
   Container,
   ContentHourSpeak,
@@ -10,33 +11,43 @@ import {
   WrapperHour,
   WrapperTitle
 } from './style';
+import { Student } from '@/app/timeline/timelines';
 
-import { useState, useMemo } from 'react';
+type Hour = {
+  id: number;
+  title: string;
+  schedule: string;
+};
 
-import biologia from '../../images/biologia.svg';
-import atelie from '../../images/atelie.svg';
-import biblioteca from '../../images/biblioteca.svg';
-import ciencias from '../../images/ciencias.svg';
-import fisica from '../../images/fisica.svg';
-import maker from '../../images/maker.svg';
+type TimelineItemProps = {
+  title: string;
+  hours: Hour[];
+  students: Student[];
+  spaceId: number;
+};
 
-export function TimelineItem({ title, hours, students, spaceId }) {
+export function TimelineItem({
+  title,
+  hours,
+  students,
+  spaceId
+}: TimelineItemProps) {
   const [show, setShow] = useState(false);
 
   const image = useMemo(() => {
     switch (title) {
       case 'Espaço Maker':
-        return maker;
+        return '/images/maker.svg';
       case 'Laboratório de Biologia':
-        return biologia;
+        return '/images/biologia.svg';
       case 'Laboratório de Física':
-        return fisica;
+        return '/images/fisica.svg';
       case 'Ateliê de Artes':
-        return atelie;
+        return '/images/atelie.svg';
       case 'Laboratório de Ciências':
-        return ciencias;
+        return '/images/ciencias.svg';
       default:
-        return biblioteca;
+        return '/images/biblioteca.svg';
     }
   }, [title]);
 

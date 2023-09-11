@@ -1,0 +1,30 @@
+import { FinalistsItem } from '@/components/FinalistsItem';
+import { Container, ContainerEmpty, Info } from './style';
+import { http } from '@/lib/http';
+import _ from 'lodash';
+
+export default async function Finalists() {
+  const { data: finalists } = await http.get('/projects/finalists');
+
+  if (_.isEmpty(finalists)) {
+    return (
+      <ContainerEmpty>
+        <Info>Os projetos ainda estão em avaliação</Info>
+      </ContainerEmpty>
+    );
+  }
+
+  return (
+    <Container>
+      {finalists.map((finalist, index) => (
+        <FinalistsItem
+          key={finalist.id}
+          group={index}
+          title={finalist.title}
+          students={finalist.students}
+          project={finalist}
+        />
+      ))}
+    </Container>
+  );
+}

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { useCallback, useState } from 'react';
@@ -79,7 +80,7 @@ export default function EvaluationParticipants({
       });
       toast.success('Avaliação adicionada');
       router.push('/');
-    } catch (error) {
+    } catch (error: any) {
       toast.error(error?.response?.data?.message);
     }
   }, [

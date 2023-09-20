@@ -1,3 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
+
 import _ from 'lodash';
 import NextAuth, { AuthOptions, User } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
@@ -12,10 +15,7 @@ export const authOptions: AuthOptions = {
         username: { label: 'Username', type: 'text', placeholder: 'jsmith' },
         password: { label: 'Password', type: 'password' }
       },
-      async authorize(credentials: {
-        username: string;
-        password: string;
-      }): Promise<User | null | undefined> {
+      async authorize(credentials) {
         try {
           const { data } = (await http.post('/login', { ...credentials })) as {
             data: User;
@@ -27,8 +27,6 @@ export const authOptions: AuthOptions = {
 
           return null;
         } catch (err) {
-          console.log(err);
-
           throw new Error(JSON.stringify(err?.response?.data?.message));
         }
       }

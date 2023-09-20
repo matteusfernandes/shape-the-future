@@ -1,4 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
+
 import { signIn } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -30,7 +32,7 @@ export default function SignIn() {
     register,
     handleSubmit,
     formState: { errors }
-  } = useForm({
+  } = useForm<any, { errors: { [key: string]: { message?: string } } }>({
     resolver: yupResolver(schema)
   });
   const { push } = useRouter();
@@ -55,7 +57,9 @@ export default function SignIn() {
       return;
     }
 
-    Object.keys(errors).map((error) => toast.error(errors[error]?.message));
+    Object.keys(errors).map((error: string) =>
+      toast.error(errors[error]?.message as string)
+    );
   }, [errors]);
 
   return (

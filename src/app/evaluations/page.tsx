@@ -54,6 +54,7 @@ export default function EvaluationBlocks() {
               students={project.students}
               horizontal
               evaluation
+              group={``}
             />
           ))}
       </Content>

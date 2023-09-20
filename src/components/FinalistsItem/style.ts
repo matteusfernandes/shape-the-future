@@ -1,6 +1,13 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { HtmlHTMLAttributes } from 'react';
 import styled, { css } from 'styled-components';
 
-export const Container = styled.div<{ evaluation?: boolean }>`
+export const Container = styled.div<
+  {
+    evaluation?: boolean;
+    onClick?: any;
+  } & HtmlHTMLAttributes<HTMLDivElement>
+>`
   flex: 1;
   display: flex;
   flex-flow: column nowrap;

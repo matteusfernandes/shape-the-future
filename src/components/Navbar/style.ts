@@ -1,5 +1,5 @@
 import styled, { css } from 'styled-components';
-import Link from 'next/link';
+import Link, { LinkProps } from 'next/link';
 
 export const Container = styled.div`
   border: 1px ${({ theme }) => theme.COLORS.WHITE[900]} solid;
@@ -12,7 +12,7 @@ export const Container = styled.div`
   }
 `;
 
-type MyLinkProps = {
+export type MyLinkProps = LinkProps & {
   isStaff?: boolean;
 };
 

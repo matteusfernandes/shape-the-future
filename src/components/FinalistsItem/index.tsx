@@ -22,24 +22,24 @@ import {
 } from './style';
 
 type FinalistsItemProps = {
-  background: string;
-  horizontal: boolean;
-  vote: number;
-  evaluation: boolean;
-  schedule: string;
-  title: string;
-  students: Student[];
+  background?: string;
+  horizontal?: boolean;
+  vote?: number;
+  evaluation?: boolean;
+  schedule?: string;
+  title?: string;
+  students?: Student[];
   project: Evaluation;
-  getProject: () => void;
+  getProject?: () => void;
   group: string;
-  notes: string;
+  notes?: string;
 };
 
 export function FinalistsItem({
   background,
   horizontal,
   vote,
-  evaluation,
+  evaluation = false,
   schedule,
   title,
   students,

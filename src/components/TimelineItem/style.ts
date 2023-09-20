@@ -73,7 +73,7 @@ type ImageProps = {
   show: boolean;
 };
 
-export const Image = styled.div<ImageProps>`
+export const ImageDiv = styled.div<ImageProps>`
   width: 100%;
   display: block;
   background: ${({ image }) => image && `url(${image})`};

@@ -2,6 +2,7 @@ import { FinalistsItem } from '@/components/FinalistsItem';
 import { Container, ContainerEmpty, Info } from './style';
 import { http } from '@/lib/http';
 import _ from 'lodash';
+import { Evaluation } from '../evaluations/evaluations';
 
 export default async function Finalists() {
   const { data: finalists } = await http.get('/projects/finalists');
@@ -16,7 +17,7 @@ export default async function Finalists() {
 
   return (
     <Container>
-      {finalists.map((finalist, index) => (
+      {finalists.map((finalist: Evaluation, index: string) => (
         <FinalistsItem
           key={finalist.id}
           group={index}

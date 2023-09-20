@@ -3,7 +3,7 @@ import {
   Container,
   ContentHourSpeak,
   Hour,
-  Image,
+  ImageDiv,
   Speaker,
   Title,
   TitleSpeak,
@@ -59,7 +59,7 @@ export function TimelineItem({
 
       <WrapperContent show={show}>
         {!show ? (
-          <Image image={image} show={show} />
+          <ImageDiv image={image} show={show} />
         ) : (
           hours
             .sort(

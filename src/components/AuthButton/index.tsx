@@ -1,17 +1,21 @@
+import _ from 'lodash';
 import { AnchorHTMLAttributes } from 'react';
+import { signOut, useSession } from 'next-auth/react';
+
 import { MyLink } from '../Navbar/style';
 
 type AuthButtonProps = AnchorHTMLAttributes<HTMLAnchorElement>;
 
 export function AuthButton({ ...rest }: AuthButtonProps) {
-  const logged = false;
+  const { data } = useSession();
 
-  return logged ? (
+  return !_.isEmpty(data) ? (
     <MyLink
       className="left"
       href=""
-      onClick={(e) => {
+      onClick={async (e) => {
         e.preventDefault();
+        await signOut();
       }}
     >
       Sair

@@ -1,6 +1,6 @@
 import styled, { css } from 'styled-components';
 
-export const Container = styled.div`
+export const Container = styled.div<{ evaluation?: boolean }>`
   flex: 1;
   display: flex;
   flex-flow: column nowrap;
@@ -12,7 +12,11 @@ export const Container = styled.div`
     `}
 `;
 
-export const Content = styled.div`
+export const Content = styled.div<{
+  background?: string;
+  horizontal?: boolean;
+  evaluation?: boolean;
+}>`
   align-items: center;
   flex: 1;
   display: flex;
@@ -49,7 +53,7 @@ export const Content = styled.div`
     `}
 `;
 
-export const Info = styled.h3`
+export const Info = styled.h3<{ horizontal?: boolean }>`
   font-size: 18px;
   font-weight: 500;
   text-transform: uppercase;
@@ -81,7 +85,7 @@ export const GroupTitle = styled.h4`
   margin-bottom: 10px;
 `;
 
-export const GroupItem = styled.span`
+export const GroupItem = styled.span<{ horizontal: boolean }>`
   font-size: 14px;
   font-weight: 500;
   margin-bottom: 5px;
@@ -103,7 +107,7 @@ export const GroupItem = styled.span`
     `}
 `;
 
-export const Finalist = styled.h3`
+export const Finalist = styled.h3<{ horizontal: boolean }>`
   font-size: 18px;
   font-weight: 500;
   text-transform: uppercase;
@@ -118,7 +122,7 @@ export const Finalist = styled.h3`
     `}
 `;
 
-export const Select = styled.div`
+export const Select = styled.div<{ active: boolean }>`
   border: 3px #ccc solid;
   min-height: 25px;
   min-width: 25px;

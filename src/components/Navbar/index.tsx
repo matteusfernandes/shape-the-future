@@ -17,11 +17,12 @@ import {
   MenuClose,
   MyLink
 } from './style';
+import { useSession } from 'next-auth/react';
 
 export function Navbar() {
-  const logged = false;
-  const [showMenu, setShowMenu] = useState(false);
+  const { data: session } = useSession();
   const pathname = usePathname();
+  const [showMenu, setShowMenu] = useState(false);
 
   // const adminRenderHeader = useMemo(() => {
   //   return (
@@ -62,7 +63,7 @@ export function Navbar() {
     (path: string, otherClass: string = '') => {
       const rest = { className: ` ${otherClass}`, href: path };
 
-      return _.isEqual(pathname, path)
+      return _.includes(pathname, path)
         ? { ...rest, className: `active ${otherClass}` }
         : rest;
     },
@@ -72,8 +73,8 @@ export function Navbar() {
   return (
     <Container>
       {/* {isLogged && (isAdmin || isStaff) && adminRenderHeader} */}
-      {logged ? (
-        <MyLink {...isActive('/')}>Avaliação</MyLink>
+      {!_.isEmpty(session) ? (
+        <MyLink {...isActive('/evaluations')}>Avaliação</MyLink>
       ) : (
         <MyLink {...isActive('/')}>Home</MyLink>
       )}
@@ -97,10 +98,10 @@ export function Navbar() {
 
         <ContentMenu>
           {/* {isLogged && (isAdmin || isStaff) && adminRenderHeader} */}
-          {logged ? (
-            <MyLink href="/">Avaliação</MyLink>
+          {!_.isEmpty(session) ? (
+            <MyLink {...isActive('/evaluations')}>Avaliação</MyLink>
           ) : (
-            <MyLink href="/">Home</MyLink>
+            <MyLink {...isActive('/')}>Home</MyLink>
           )}
 
           <MyLink {...isActive('/timeline', 'left')}>Cronograma</MyLink>

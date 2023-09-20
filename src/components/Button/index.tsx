@@ -2,7 +2,7 @@ import { Container } from './style';
 
 type ButtonProps = HTMLButtonElement & {
   label?: string;
-  borderless: boolean;
+  borderless?: boolean;
   full?: boolean;
 };
 

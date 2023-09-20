@@ -1,5 +1,5 @@
 'use client';
-
+import { SessionProvider } from 'next-auth/react';
 import { ThemeProvider } from 'styled-components';
 import StyledComponentsRegistry from '@/lib/registry';
 import theme from '@/theme';
@@ -11,7 +11,9 @@ type ProvidersProps = {
 export default function Providers({ children }: ProvidersProps) {
   return (
     <StyledComponentsRegistry>
-      <ThemeProvider theme={theme}>{children}</ThemeProvider>
+      <SessionProvider>
+        <ThemeProvider theme={theme}>{children}</ThemeProvider>
+      </SessionProvider>
     </StyledComponentsRegistry>
   );
 }

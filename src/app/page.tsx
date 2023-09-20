@@ -1,3 +1,9 @@
+import _ from 'lodash';
+import { getServerSession } from 'next-auth';
+import { redirect } from 'next/navigation';
+
+import { authOptions } from './api/auth/[...nextauth]/route';
+
 import {
   Columns,
   Content,
@@ -11,7 +17,13 @@ import {
   Title
 } from './style';
 
-export default function Home() {
+export default async function Home() {
+  const session = await getServerSession(authOptions);
+
+  if (!_.isEmpty(session?.user)) {
+    return redirect('/evaluations');
+  }
+
   return (
     <>
       <Columns>

@@ -1,3 +1,4 @@
+import { forwardRef } from 'react';
 import { Container, InputText, Label, SelectText } from './style';
 
 type InputProps = {
@@ -6,12 +7,15 @@ type InputProps = {
   children?: React.ReactNode;
 };
 
-export function Input({ label, select, children, ...props }: InputProps) {
+export const Input = forwardRef(function Input(
+  { label, select, children, ...props }: InputProps,
+  ref
+) {
   return (
     <Container>
       {label && <Label>{label}</Label>}
-      {!select && <InputText {...props} />}
+      {!select && <InputText {...props} ref={ref} />}
       {select && <SelectText {...props}>{children}</SelectText>}
     </Container>
   );
-}
+});

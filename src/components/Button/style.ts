@@ -1,6 +1,9 @@
 import styled, { css } from 'styled-components';
 
-export const Container = styled.button`
+export const Container = styled.button<{
+  full?: boolean;
+  borderless?: boolean;
+}>`
   background-color: ${({ theme }) => theme.COLORS.WHITE[900]};
   border: 1px ${({ theme }) => theme.COLORS.WHITE[900]} solid;
   color: ${({ theme }) => theme.COLORS.BLUE[200]};

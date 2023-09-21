@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import _ from 'lodash';
 import { usePathname } from 'next/navigation';
 
@@ -23,56 +23,53 @@ export function Navbar() {
   const { data: session } = useSession();
   const pathname = usePathname();
   const [showMenu, setShowMenu] = useState(false);
-
-  // const adminRenderHeader = useMemo(() => {
-  //   return (
-  //     <>
-  //       <MyLink to={'/'}>Cadastro</MyLink>
-  //       {user.role === 'staff' ? (
-  //         <MyLink className="left" isStaff>
-  //           Resultados
-  //         </MyLink>
-  //       ) : (
-  //         <MyLink to={'/results'} className="left">
-  //           Resultados
-  //         </MyLink>
-  //       )}
-
-  //       <Logo />
-  //       {user.role === 'staff' ? (
-  //         <MyLink isStaff>Cronograma</MyLink>
-  //       ) : (
-  //         <MyLink to={'/timeline'}>Cronograma</MyLink>
-  //       )}
-
-  //       <MyLink
-  //         className="left"
-  //         to={'/logoff'}
-  //         onClick={(e) => {
-  //           e.preventDefault();
-  //           setShowMenu(false);
-  //         }}
-  //       >
-  //         logoff
-  //       </MyLink>
-  //     </>
-  //   );
-  // }, []);
+  const isAdminOrStaff = ['admin', 'staff'].includes(
+    session?.user?.role as string
+  );
 
   const isActive = useCallback(
     (path: string, otherClass: string = '') => {
       const rest = { className: ` ${otherClass}`, href: path };
 
-      return _.isEqual(pathname, path)
+      return _.includes(pathname, path)
         ? { ...rest, className: `active ${otherClass}` }
         : rest;
     },
     [pathname]
   );
 
+  const adminRenderHeader = useMemo(() => {
+    return (
+      <>
+        <MyLink {...isActive('/')}>Cadastro</MyLink>
+        {session?.user?.role === 'staff' ? (
+          <MyLink {...isActive('', 'left')} isStaff>
+            Resultados
+          </MyLink>
+        ) : (
+          <MyLink {...isActive('/results', 'left')}>Resultados</MyLink>
+        )}
+
+        <Logo />
+        {session?.user?.role === 'staff' ? (
+          <MyLink {...isActive('')} isStaff>
+            Cronograma
+          </MyLink>
+        ) : (
+          <MyLink {...isActive('/timeline')}>Cronograma</MyLink>
+        )}
+
+        <AuthButton {...isActive('/signin', 'left')} />
+      </>
+    );
+  }, [isActive, session?.user?.role]);
+
+  if (isAdminOrStaff) {
+    return <Container>{adminRenderHeader}</Container>;
+  }
+
   return (
     <Container>
-      {/* {isLogged && (isAdmin || isStaff) && adminRenderHeader} */}
       {!_.isEmpty(session) ? (
         <MyLink {...isActive('/evaluations')}>Avaliação</MyLink>
       ) : (
@@ -97,20 +94,25 @@ export function Navbar() {
         </MenuClose>
 
         <ContentMenu>
-          {/* {isLogged && (isAdmin || isStaff) && adminRenderHeader} */}
-          {!_.isEmpty(session) ? (
-            <MyLink {...isActive('/evaluations')}>Avaliação</MyLink>
+          {isAdminOrStaff ? (
+            adminRenderHeader
           ) : (
-            <MyLink {...isActive('/')}>Home</MyLink>
+            <>
+              {!_.isEmpty(session) ? (
+                <MyLink {...isActive('/evaluations')}>Avaliação</MyLink>
+              ) : (
+                <MyLink {...isActive('/')}>Home</MyLink>
+              )}
+
+              <MyLink {...isActive('/timeline', 'left')}>Cronograma</MyLink>
+
+              <Logo />
+
+              <MyLink {...isActive('/finalists')}>Finalistas</MyLink>
+
+              <AuthButton {...isActive('/signin', 'left')} />
+            </>
           )}
-
-          <MyLink {...isActive('/timeline', 'left')}>Cronograma</MyLink>
-
-          <Logo />
-
-          <MyLink {...isActive('/finalists')}>Finalistas</MyLink>
-
-          <AuthButton {...isActive('/signin', 'left')} />
         </ContentMenu>
       </Menu>
 

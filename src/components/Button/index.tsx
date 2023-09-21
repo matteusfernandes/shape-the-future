@@ -1,6 +1,7 @@
+import { HtmlHTMLAttributes } from 'react';
 import { Container } from './style';
 
-type ButtonProps = {
+type ButtonProps = HtmlHTMLAttributes<HTMLButtonElement> & {
   label?: string;
   borderless?: boolean;
   full?: boolean;

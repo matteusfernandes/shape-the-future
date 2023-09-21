@@ -1,18 +1,18 @@
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../api/auth/[...nextauth]/route';
-import _ from 'lodash';
 import { redirect } from 'next/navigation';
 
-type EvaluationRootProps = {
-  children: React.ReactNode;
-};
-
-export default async function EvaluationRoot({
+export default async function AdminRootLayout({
   children
-}: EvaluationRootProps) {
+}: {
+  children: React.ReactNode;
+}) {
   const session = await getServerSession(authOptions);
+  const isAdminOrStaff = ['admin', 'staff'].includes(
+    session?.user?.role as string
+  );
 
-  if (_.isEmpty(session!.user)) {
+  if (!isAdminOrStaff) {
     return redirect('/');
   }
 

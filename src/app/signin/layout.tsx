@@ -1,7 +1,8 @@
-import { getServerSession } from 'next-auth';
-import { authOptions } from '../api/auth/[...nextauth]/route';
 import _ from 'lodash';
+import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
+
+import { authOptions } from '../api/auth/[...nextauth]/route';
 
 type SignInRootProps = {
   children: React.ReactNode;
@@ -14,5 +15,5 @@ export default async function SignInRoot({ children }: SignInRootProps) {
     return redirect('/');
   }
 
-  return children;
+  return <>{children}</>;
 }

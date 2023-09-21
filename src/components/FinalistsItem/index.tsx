@@ -50,7 +50,7 @@ export function FinalistsItem({
 }: FinalistsItemProps) {
   const router = useRouter();
   const { data: session } = useSession();
-  const [isVote, setIsVote] = useState([]);
+  const [isVote, setIsVote] = useState(false);
 
   const handleNavigate = useCallback(() => {
     const urlParams = new URLSearchParams({

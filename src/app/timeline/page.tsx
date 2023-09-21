@@ -22,7 +22,7 @@ export default function Timeline() {
   const spacesFiltered = useMemo(() => {
     return spaces.map((space) => ({
       ...space,
-      projects: space.projects.filter((project) =>
+      projects: space?.projects?.filter((project) =>
         block
           ? BLOCK1.includes(project.schedule)
           : BLOCK2.includes(project.schedule)

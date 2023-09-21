@@ -63,7 +63,7 @@ export function Navbar() {
     (path: string, otherClass: string = '') => {
       const rest = { className: ` ${otherClass}`, href: path };
 
-      return _.includes(pathname, path)
+      return _.isEqual(pathname, path)
         ? { ...rest, className: `active ${otherClass}` }
         : rest;
     },

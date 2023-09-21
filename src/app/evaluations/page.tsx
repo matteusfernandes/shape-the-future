@@ -23,7 +23,7 @@ export default function EvaluationBlocks() {
   }, []);
 
   const projectsFiltered = useMemo(() => {
-    return projects.filter((project) =>
+    return projects?.filter((project) =>
       block
         ? BLOCK1.includes(project.schedule)
         : BLOCK2.includes(project.schedule)
@@ -40,7 +40,7 @@ export default function EvaluationBlocks() {
 
       <Content>
         {projectsFiltered
-          .filter((project) =>
+          ?.filter((project) =>
             _.isEqual(session?.user.role, 'admin')
               ? true
               : project.spaceId === session?.user.spaceId

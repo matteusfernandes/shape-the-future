@@ -62,7 +62,7 @@ export function TimelineItem({
           <ImageDiv image={image} show={show} />
         ) : (
           hours
-            .sort(
+            ?.sort(
               (a, b) =>
                 +a?.schedule.split(':').join('') -
                 +b?.schedule.split(':').join('')

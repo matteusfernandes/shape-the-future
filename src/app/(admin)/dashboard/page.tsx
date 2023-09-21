@@ -1,26 +1,26 @@
 import { ResultsLinks } from '@/components/ResultsLinks';
 
-export default function Results() {
+export default function Dashboard() {
   return (
     <ResultsLinks
       results={[
         {
           id: 0,
           background: '/images/avaliacoes.svg',
-          link: '/results/space',
-          title: 'Avaliações'
+          link: '/dashboard/space',
+          title: 'Espaços'
         },
         {
           id: 1,
           background: '/images/jurados.svg',
-          link: '/results/judget-votes',
-          title: 'Votos dos Jurados'
+          link: '/dashboard/judget',
+          title: 'Jurados'
         },
         {
           id: 2,
           background: '/images/populares.svg',
-          link: '/results/popular-votes',
-          title: 'Votos populares'
+          link: '/dashboard/projects',
+          title: 'Projetos'
         }
       ]}
     />

@@ -41,7 +41,8 @@ export function Navbar() {
   const adminRenderHeader = useMemo(() => {
     return (
       <>
-        <MyLink {...isActive('/')}>Cadastro</MyLink>
+        <MyLink {...isActive('/dashboard')}>Cadastro</MyLink>
+
         {session?.user?.role === 'staff' ? (
           <MyLink {...isActive('', 'left')} isStaff>
             Resultados

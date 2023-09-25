@@ -10,13 +10,17 @@ type InputProps = HtmlHTMLAttributes<HTMLInputElement | HTMLSelectElement> & {
 
 export const Input = forwardRef(function Input(
   { label, select, children, type, ...props }: InputProps,
-  ref: LegacyRef<HTMLInputElement> | undefined
+  ref: LegacyRef<HTMLInputElement | HTMLSelectElement> | undefined
 ) {
   return (
     <Container>
       {label && <Label>{label}</Label>}
       {!select && <InputText type={type} {...props} ref={ref} />}
-      {select && <SelectText {...props}>{children}</SelectText>}
+      {select && (
+        <SelectText {...props} ref={ref}>
+          {children}
+        </SelectText>
+      )}
     </Container>
   );
 });

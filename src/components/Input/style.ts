@@ -36,4 +36,5 @@ export const SelectText = styled.select`
   padding: 20px;
   font-size: 18px;
   color: #1e1e1e;
+  border-radius: 4.5px;
 `;

@@ -30,7 +30,7 @@ type FinalistsItemProps = {
   schedule?: string;
   title?: string;
   students?: Student[];
-  project: Evaluation;
+  project?: Evaluation;
   getProject?: () => void;
   group: string;
   notes?: number;
@@ -59,7 +59,7 @@ export function FinalistsItem({
       schedule: project.schedule
     });
     router.push(`/evaluations/participant?${urlParams}`);
-  }, [project.id, project.schedule, project.title, router]);
+  }, [project?.id, project?.schedule, project?.title, router]);
 
   const handleFinalists = useCallback(async () => {
     try {
@@ -104,7 +104,10 @@ export function FinalistsItem({
   }, [project]);
 
   return (
-    <Container evaluation={evaluation} onClick={evaluation && handleNavigate}>
+    <Container
+      evaluation={evaluation}
+      onClick={() => evaluation && handleNavigate}
+    >
       <Content
         background={background}
         horizontal={horizontal}

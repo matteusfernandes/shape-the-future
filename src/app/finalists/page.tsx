@@ -6,6 +6,7 @@ import { Evaluation } from '../evaluations/evaluations';
 
 export default async function Finalists() {
   const { data: finalists } = await http.get('/projects/finalists');
+  const { data: vote } = await http.get('/vote');
 
   if (_.isEmpty(finalists)) {
     return (
@@ -24,6 +25,7 @@ export default async function Finalists() {
           title={finalist.title}
           students={finalist.students}
           project={finalist}
+          vote={vote[0].active}
         />
       ))}
     </Container>

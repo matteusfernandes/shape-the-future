@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
@@ -25,6 +25,7 @@ type FinalistsItemProps = {
   background?: string;
   horizontal?: boolean;
   vote?: number;
+  isVote?: boolean;
   evaluation?: boolean;
   schedule?: string;
   title?: string;
@@ -32,25 +33,24 @@ type FinalistsItemProps = {
   project: Evaluation;
   getProject?: () => void;
   group: string;
-  notes?: string;
+  notes?: number;
 };
 
 export function FinalistsItem({
   background,
   horizontal,
   vote,
+  isVote = false,
   evaluation = false,
   schedule,
   title,
   students,
   project,
-  getProject,
   group,
   notes
 }: FinalistsItemProps) {
   const router = useRouter();
   const { data: session } = useSession();
-  const [isVote, setIsVote] = useState(false);
 
   const handleNavigate = useCallback(() => {
     const urlParams = new URLSearchParams({
@@ -62,11 +62,23 @@ export function FinalistsItem({
   }, [project.id, project.schedule, project.title, router]);
 
   const handleFinalists = useCallback(async () => {
-    await http.put(`/projects/finalist/update/${project?.id}`, {
-      finalist: !project.finalist
-    });
-    getProject && getProject();
-  }, [project, getProject]);
+    try {
+      const { data } = await http.put(
+        `/projects/finalist/update/${project?.id}`,
+        {
+          finalist: !project.finalist
+        }
+      );
+      router.refresh();
+      if (data.finalist) {
+        toast.success(`${project.title} adicionado aos finalistas`);
+      } else {
+        toast.warning(`${project.title} removido dos finalistas`);
+      }
+    } catch {
+      toast.error(`Erro ao habilitar finalista`);
+    }
+  }, [project, router]);
 
   const handlePublicVote = useCallback(async () => {
     try {
@@ -90,15 +102,6 @@ export function FinalistsItem({
       toast.error('Você já votou');
     }
   }, [project]);
-
-  const handleVoteStatus = useCallback(async () => {
-    const { data } = await http.get('/vote');
-    setIsVote(data[0].active);
-  }, []);
-
-  useEffect(() => {
-    handleVoteStatus();
-  }, [handleVoteStatus]);
 
   return (
     <Container evaluation={evaluation} onClick={evaluation && handleNavigate}>

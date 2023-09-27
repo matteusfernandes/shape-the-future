@@ -12,7 +12,7 @@ export default async function EvaluationRoot({
 }: EvaluationRootProps) {
   const session = await getServerSession(authOptions);
 
-  if (_.isEmpty(session!.user)) {
+  if (_.isEmpty(session?.user)) {
     return redirect('/');
   }
 

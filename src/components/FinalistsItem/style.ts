@@ -5,7 +5,6 @@ import styled, { css } from 'styled-components';
 export const Container = styled.div<
   {
     evaluation?: boolean;
-    onClick?: any;
   } & HtmlHTMLAttributes<HTMLDivElement>
 >`
   flex: 1;

@@ -11,7 +11,7 @@ export const Container = styled.div`
 `;
 
 export const Content = styled.form`
-  max-width: 500px;
+  max-width: 320px;
   flex-flow: column nowrap;
   width: 100%;
   display: flex;

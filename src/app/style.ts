@@ -120,3 +120,27 @@ export const RightBlock = styled.span`
     font-size: 24px;
   }
 `;
+
+export const NotFoundContainer = styled.div`
+  flex: 1;
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+  justify-content: center;
+
+  h2 {
+    font-size: 22px;
+    font-weight: bold;
+    color: #f1f1f1;
+  }
+
+  p {
+    font-size: 18px;
+    color: #ccc;
+    margin: 20px;
+  }
+
+  a {
+    color: #fff;
+  }
+`;

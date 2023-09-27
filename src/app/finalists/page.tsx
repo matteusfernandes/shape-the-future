@@ -25,7 +25,7 @@ export default async function Finalists() {
           title={finalist.title}
           students={finalist.students}
           project={finalist}
-          vote={vote[0].active}
+          isVote={vote[0].active}
         />
       ))}
     </Container>

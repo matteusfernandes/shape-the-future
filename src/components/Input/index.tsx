@@ -2,6 +2,7 @@ import { HtmlHTMLAttributes, LegacyRef, forwardRef } from 'react';
 import {
   AddedButton,
   Container,
+  Error,
   InputText,
   Label,
   RemoveButton,
@@ -11,6 +12,7 @@ import {
 type InputProps = HtmlHTMLAttributes<HTMLInputElement | HTMLSelectElement> & {
   label?: string;
   type?: string;
+  error?: string;
   select?: boolean;
   children?: React.ReactNode;
   addedField?: (() => void) | undefined | null;
@@ -23,6 +25,7 @@ export const Input = forwardRef(function Input(
     select,
     children,
     type,
+    error,
     addedField,
     removeField,
     ...props
@@ -52,6 +55,7 @@ export const Input = forwardRef(function Input(
           ❎
         </RemoveButton>
       )}
+      {error && <Error>{error}</Error>}
     </Container>
   );
 });

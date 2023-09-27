@@ -10,7 +10,7 @@ import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
 
 import { Container, Content } from './style';
-import { useCallback, useEffect } from 'react';
+import { useCallback } from 'react';
 import _ from 'lodash';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
@@ -47,20 +47,10 @@ export default function SignIn() {
       }
 
       toast.success('Logado com Sucesso!');
-      push('/evaluations');
+      push('/');
     },
     [push]
   );
-
-  useEffect(() => {
-    if (_.isEmpty(errors)) {
-      return;
-    }
-
-    Object.keys(errors).map((error: string) =>
-      toast.error(errors[error]?.message as string)
-    );
-  }, [errors]);
 
   return (
     <Container>
@@ -69,6 +59,7 @@ export default function SignIn() {
           label="Usuário"
           placeholder="Digite seu Usuário"
           {...register('username')}
+          error={errors?.username?.message as string}
         />
 
         <Input
@@ -76,6 +67,7 @@ export default function SignIn() {
           label="Senha"
           placeholder="Digite sua Senha"
           {...register('password')}
+          error={errors?.password?.message as string}
         />
 
         <Button label="Entrar" />

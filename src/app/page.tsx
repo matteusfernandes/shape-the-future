@@ -19,8 +19,15 @@ import {
 
 export default async function Home() {
   const session = await getServerSession(authOptions);
+  const isAdminOrStaff = ['admin', 'staff'].includes(
+    session?.user?.role as string
+  );
 
-  if (!_.isEmpty(session?.user)) {
+  if (!_.isEmpty(session?.user) && isAdminOrStaff) {
+    return redirect('/dashboard');
+  }
+
+  if (!_.isEmpty(session?.user) && !isAdminOrStaff) {
     return redirect('/evaluations');
   }
 

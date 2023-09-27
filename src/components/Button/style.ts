@@ -10,12 +10,14 @@ export const Container = styled.button<
   background-color: ${({ theme }) => theme.COLORS.WHITE[900]};
   border: 1px ${({ theme }) => theme.COLORS.WHITE[900]} solid;
   color: ${({ theme }) => theme.COLORS.BLUE[200]};
-  font-size: 18px;
+  font-size: 14px;
   padding: 10px 30px;
+  height: 40px;
   text-transform: uppercase;
   font-weight: 700;
   cursor: pointer;
   transition: all ease-in-out 0.3s;
+  border-radius: 4.5px;
 
   &:disabled {
     cursor: not-allowed;

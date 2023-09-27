@@ -1,0 +1,133 @@
+'use client';
+
+import styled from 'styled-components';
+
+export const ContainerDashboard = styled.div`
+  flex: 1;
+  display: grid;
+  grid-template-columns: 200px 1fr;
+`;
+export const MenuDashboard = styled.div`
+  display: flex;
+  flex: 1;
+  flex-flow: column nowrap;
+  padding: 20px;
+  gap: 20px;
+
+  h3 {
+    font-size: 18px;
+    font-weight: bold;
+    color: #fff;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    font-size: 14px;
+    color: #fff;
+
+    &::before {
+      border: 1px #f1f1f1 solid;
+      border-radius: 7.5px;
+      content: '';
+      display: inline-block;
+      height: 15px;
+      width: 15px;
+      margin-right: 20px;
+    }
+  }
+`;
+
+export const ContentDashboard = styled.div`
+  flex: 1;
+  padding: 20px;
+`;
+
+export const WrapperContent = styled.div`
+  display: grid;
+  grid-template-rows: auto 1fr;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  height: 100%;
+
+  h3 {
+    font-size: 18px;
+    color: #fff;
+  }
+`;
+
+export const HeaderContent = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+`;
+
+export const HeaderButton = styled.button`
+  border: none;
+  border-radius: 4.5px;
+  padding: 10px 20px;
+  background: #00c1ce;
+  font-weight: bold;
+  color: #fff;
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.7;
+  }
+`;
+
+export const RemoveButton = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 4.5px;
+  background: none;
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.7;
+  }
+`;
+
+export const ContentForm = styled.div`
+  display: flex;
+  flex-flow: column nowrap;
+  background-color: #fff;
+  border-radius: 10px;
+  overflow-x: auto;
+`;
+
+export const FormLine = styled.div`
+  border-bottom: 1px #f1f1f1 solid;
+  padding: 0 20px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  span {
+    font-size: 14px;
+  }
+
+  div {
+    flex: 1;
+    display: flex;
+    gap: 10;
+    overflow: hidden;
+    white-space: nowrap;
+    padding-right: 20px;
+
+    span {
+      margin: 0 5px;
+    }
+  }
+
+  &:hover {
+    background-color: #f1f1f1;
+  }
+`;

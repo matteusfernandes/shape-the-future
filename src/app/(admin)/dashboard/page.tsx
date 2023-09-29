@@ -1,3 +1,6 @@
+'use client';
+
+import { useCallback, useEffect, useState } from 'react';
 import { http } from '@/lib/http';
 import {
   ContentForm,
@@ -7,18 +10,37 @@ import {
   RemoveButton,
   WrapperContent
 } from './style';
+import { toast } from 'react-toastify';
 
 type Space = { id: number; name: string };
 
-export default async function Dashboard() {
-  const { data } = await http.get<Space[]>('/spaces');
+export default function Dashboard() {
+  const [data, setData] = useState<Space[]>([]);
+
+  const handleGetSpace = useCallback(async () => {
+    const { data: space } = await http.get<Space[]>('/spaces');
+    setData(space);
+  }, []);
+
+  const handleRemoveSpace = useCallback(
+    async (space: Space) => {
+      await http.delete(`/spaces/${space.id}`);
+      toast.success(`${space.name} - removido com sucesso!`);
+      handleGetSpace();
+    },
+    [handleGetSpace]
+  );
+
+  useEffect(() => {
+    handleGetSpace();
+  }, [handleGetSpace]);
 
   return (
     <WrapperContent>
       <HeaderContent>
         <h3>Todos os Espaços</h3>
 
-        <HeaderButton>Adicionar Espaço</HeaderButton>
+        <HeaderButton href="/dashboard/space">Adicionar Espaço</HeaderButton>
       </HeaderContent>
 
       <ContentForm>
@@ -26,7 +48,7 @@ export default async function Dashboard() {
           <FormLine key={space?.id?.toString()}>
             <span>{space?.name}</span>
 
-            <RemoveButton>
+            <RemoveButton onClick={() => handleRemoveSpace(space)}>
               <svg
                 viewBox="0 0 24 24"
                 width="18"

@@ -11,6 +11,7 @@ import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
 import { http } from '@/lib/http';
 import { useRouter } from 'next/navigation';
+import { FormTitle } from '../judget/create/style';
 
 type InputSchema = {
   space: string;
@@ -18,13 +19,17 @@ type InputSchema = {
 
 const schema = yup
   .object({
-    space: yup.string().required()
+    space: yup.string().required('Campo requerido')
   })
   .required();
 
 export default function Space() {
   const { back } = useRouter();
-  const { register, handleSubmit } = useForm<InputSchema>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors }
+  } = useForm<InputSchema>({
     resolver: yupResolver(schema)
   });
 
@@ -44,16 +49,21 @@ export default function Space() {
   );
 
   return (
-    <Container onSubmit={handleSubmit(handleSpace)}>
-      <Content>
-        <Input
-          label="Espaço"
-          placeholder="Digite o espaço"
-          {...register('space')}
-        />
+    <>
+      <FormTitle>Adicionar um novo espaço</FormTitle>
 
-        <Button label="Enviar" />
-      </Content>
-    </Container>
+      <Container onSubmit={handleSubmit(handleSpace)}>
+        <Content>
+          <Input
+            label="Espaço"
+            placeholder="Cadastrar um novo espaço"
+            error={errors.space?.message}
+            {...register('space')}
+          />
+
+          <Button label="Enviar" />
+        </Content>
+      </Container>
+    </>
   );
 }

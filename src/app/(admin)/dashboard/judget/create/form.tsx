@@ -6,7 +6,7 @@ import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { toast } from 'react-toastify';
 
-import { Container, Content } from './style';
+import { Container, Content, FormTitle } from './style';
 
 import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
@@ -33,7 +33,11 @@ const schema = yup.object({
 export function Form({ data }: { data: JudgetProps[] }) {
   const { push } = useRouter();
 
-  const { handleSubmit, register } = useForm<InputProps>({
+  const {
+    handleSubmit,
+    register,
+    formState: { errors }
+  } = useForm<InputProps>({
     resolver: yupResolver(schema)
   });
 
@@ -54,31 +58,42 @@ export function Form({ data }: { data: JudgetProps[] }) {
   );
 
   return (
-    <Container onSubmit={handleSubmit(handleDataSubmit)}>
-      <Content>
-        <Input
-          label="Usuário"
-          placeholder="Login do usuário"
-          {...register('username')}
-        />
-        <Input
-          label="Senha"
-          placeholder="Senha do usuário"
-          type="password"
-          {...register('password')}
-        />
+    <>
+      <FormTitle>Cadastrar novo Jurado</FormTitle>
 
-        <Input label="Espaço" select {...register('spaceId')}>
-          <option>Selecionar espaço</option>
-          {data?.map((item) => (
-            <option key={item?.id.toString()} value={item?.id}>
-              {item?.name}
-            </option>
-          ))}
-        </Input>
+      <Container onSubmit={handleSubmit(handleDataSubmit)}>
+        <Content>
+          <Input
+            label="Usuário"
+            placeholder="Login do usuário"
+            error={errors?.username?.message}
+            {...register('username')}
+          />
+          <Input
+            label="Senha"
+            placeholder="Senha do usuário"
+            type="password"
+            error={errors?.password?.message}
+            {...register('password')}
+          />
 
-        <Button label="Enviar" />
-      </Content>
-    </Container>
+          <Input
+            label="Espaço"
+            select
+            error={errors?.spaceId?.message}
+            {...register('spaceId')}
+          >
+            <option>Selecionar espaço</option>
+            {data?.map((item) => (
+              <option key={item?.id.toString()} value={item?.id}>
+                {item?.name}
+              </option>
+            ))}
+          </Input>
+
+          <Button label="Enviar" />
+        </Content>
+      </Container>
+    </>
   );
 }

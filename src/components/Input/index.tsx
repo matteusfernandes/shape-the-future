@@ -6,7 +6,8 @@ import {
   InputText,
   Label,
   RemoveButton,
-  SelectText
+  SelectText,
+  WrapperButtons
 } from './style';
 
 type InputProps = HtmlHTMLAttributes<HTMLInputElement | HTMLSelectElement> & {
@@ -35,26 +36,24 @@ export const Input = forwardRef(function Input(
   return (
     <Container>
       {label && <Label>{label}</Label>}
-      {!select && <InputText type={type} {...props} ref={ref} />}
-      {select && (
-        <SelectText {...props} ref={ref}>
-          {children}
-        </SelectText>
-      )}
-      {addedField && (
-        <AddedButton
-          type="button"
-          onClick={addedField}
-          first={addedField && removeField ? true : false}
-        >
-          ✅
-        </AddedButton>
-      )}
-      {removeField && (
-        <RemoveButton type="button" onClick={removeField}>
-          ❎
-        </RemoveButton>
-      )}
+      <WrapperButtons>
+        {!select && <InputText type={type} {...props} ref={ref} />}
+        {select && (
+          <SelectText {...props} ref={ref}>
+            {children}
+          </SelectText>
+        )}
+        {addedField && (
+          <AddedButton type="button" onClick={addedField}>
+            ✅
+          </AddedButton>
+        )}
+        {removeField && (
+          <RemoveButton type="button" onClick={removeField}>
+            ❎
+          </RemoveButton>
+        )}
+      </WrapperButtons>
       {error && <Error>{error}</Error>}
     </Container>
   );

@@ -2,7 +2,7 @@ import styled from 'styled-components';
 
 export const Container = styled.div`
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   flex-flow: column nowrap;
   margin-bottom: 20px;
   width: 100%;
@@ -32,22 +32,25 @@ export const InputText = styled.input`
 export const SelectText = styled.select`
   border: 1px ${({ theme }) => theme.COLORS.WHITE[900]} solid;
   background: rgba(255, 255, 255, 0.5);
-  max-width: 340px;
   width: 100%;
-  padding: 20px;
+  padding: 0 20px;
+  height: 50px;
   font-size: 18px;
   color: #1e1e1e;
   border-radius: 4.5px;
 `;
 
+export const WrapperButtons = styled.div`
+  width: 100%;
+  display: flex;
+`;
+
 export const AddedButton = styled.button<{ first?: boolean }>`
-  position: absolute;
   border: none;
   background-color: transparent;
   height: 40px;
+  width: 40px;
   font-size: 28px;
-  bottom: 10px;
-  right: ${(props) => (props.first ? '10px' : '50px')};
   cursor: pointer;
 
   &:hover {
@@ -56,10 +59,10 @@ export const AddedButton = styled.button<{ first?: boolean }>`
 `;
 
 export const RemoveButton = styled.button`
-  position: absolute;
   border: none;
   background-color: transparent;
   height: 40px;
+  width: 40px;
   font-size: 28px;
   bottom: 10px;
   right: 50px;

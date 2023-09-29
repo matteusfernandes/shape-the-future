@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import styled from 'styled-components';
 
 export const ContainerDashboard = styled.div`
@@ -66,7 +67,7 @@ export const HeaderContent = styled.div`
   width: 100%;
 `;
 
-export const HeaderButton = styled.button`
+export const HeaderButton = styled(Link)`
   border: none;
   border-radius: 4.5px;
   padding: 10px 20px;
@@ -74,6 +75,7 @@ export const HeaderButton = styled.button`
   font-weight: bold;
   color: #fff;
   cursor: pointer;
+  text-decoration: none;
 
   &:hover {
     opacity: 0.7;
@@ -94,11 +96,15 @@ export const RemoveButton = styled.button`
   }
 `;
 
+export const WrapperContentForm = styled.div`
+  max-height: 460px;
+  overflow-x: auto;
+`;
+
 export const ContentForm = styled.div`
   display: flex;
   flex-flow: column nowrap;
   background-color: #fff;
-  border-radius: 10px;
   overflow-x: auto;
 `;
 
@@ -121,6 +127,7 @@ export const FormLine = styled.div`
     overflow: hidden;
     white-space: nowrap;
     padding-right: 20px;
+    cursor: pointer;
 
     span {
       margin: 0 5px;

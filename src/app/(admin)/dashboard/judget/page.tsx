@@ -32,7 +32,9 @@ export default async function Judget() {
       <HeaderContent>
         <h3>Todos os Jurados</h3>
 
-        <HeaderButton>Adicionar Jurado</HeaderButton>
+        <HeaderButton href="/dashboard/judget/create">
+          Adicionar Jurado
+        </HeaderButton>
       </HeaderContent>
 
       <ContentForm>

@@ -31,7 +31,7 @@ const schema = yup.object({
 });
 
 export function Form({ data }: { data: JudgetProps[] }) {
-  const { push } = useRouter();
+  const { back } = useRouter();
 
   const {
     handleSubmit,
@@ -49,12 +49,12 @@ export function Form({ data }: { data: JudgetProps[] }) {
           role: 'judge'
         });
         toast.success('Cadastrado com Sucesso');
-        push('/dashboard');
+        back();
       } catch (error) {
         /* empty */
       }
     },
-    [push]
+    [back]
   );
 
   return (

@@ -1,4 +1,7 @@
+'use client';
+
 import { http } from '@/lib/http';
+
 import {
   ContentForm,
   FormLine,
@@ -8,6 +11,8 @@ import {
   WrapperContent,
   WrapperContentForm
 } from '../style';
+import { useCallback, useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 
 type Project = {
   id: number;
@@ -20,9 +25,32 @@ type Project = {
 
 type Space = { id: number; name: string };
 
-export default async function Projects() {
-  const { data } = await http.get<Project[]>('/projects');
-  const { data: spaces } = await http.get<Space[]>('/spaces');
+export default function Projects() {
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [spaces, setSpaces] = useState<Space[]>([]);
+
+  const getProjectsAndSpaces = useCallback(async () => {
+    const [allprojects, allSpaces] = await Promise.all([
+      http.get<Project[]>('/projects'),
+      http.get<Space[]>('/spaces')
+    ]);
+
+    setProjects(allprojects.data as Project[]);
+    setSpaces(allSpaces.data as Space[]);
+  }, []);
+
+  const handleRemoveSpace = useCallback(
+    async (project: Project) => {
+      await http.delete(`/projects/${project.id}`);
+      toast.success(`${project.title} - removido com sucesso!`);
+      getProjectsAndSpaces();
+    },
+    [getProjectsAndSpaces]
+  );
+
+  useEffect(() => {
+    getProjectsAndSpaces();
+  }, [getProjectsAndSpaces]);
 
   return (
     <WrapperContent>
@@ -36,18 +64,19 @@ export default async function Projects() {
 
       <WrapperContentForm>
         <ContentForm>
-          {data?.map((space) => {
-            const spaceProject = spaces.find((s) => s?.id === space?.id);
+          {projects?.map((project) => {
+            const spaceProject = spaces.find((s) => s?.id === project?.id);
 
             return (
-              <FormLine key={space?.id?.toString()}>
+              <FormLine key={project?.id?.toString()}>
                 <div>
-                  <span>{space?.title}</span> | <span>{space?.subtitle}</span> |
-                  <span>{space?.schedule}</span> |{' '}
+                  <span>{project?.title}</span> |{' '}
+                  <span>{project?.subtitle}</span> |
+                  <span>{project?.schedule}</span> |{' '}
                   <span>{spaceProject?.name}</span>
                 </div>
 
-                <RemoveButton>
+                <RemoveButton onClick={() => handleRemoveSpace(project)}>
                   <svg
                     viewBox="0 0 24 24"
                     width="18"

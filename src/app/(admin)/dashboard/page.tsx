@@ -14,7 +14,7 @@ import {
 import { toast } from 'react-toastify';
 import Link from 'next/link';
 
-type Space = { id: number; name: string };
+export type Space = { id: number; name: string };
 
 export default function Dashboard() {
   const [data, setData] = useState<Space[]>([]);

@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Container, Content } from '../style';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -12,6 +12,7 @@ import { Input } from '@/components/Input';
 import { http } from '@/lib/http';
 import { useRouter } from 'next/navigation';
 import { FormTitle } from '../../judget/create/style';
+import { Space } from '../../page';
 
 type InputSchema = {
   space: string;
@@ -31,6 +32,7 @@ type SpaceUpdateProps = {
 
 export default function SpaceUpdate({ params: { id } }: SpaceUpdateProps) {
   const { back } = useRouter();
+  const [user, setUser] = useState<Space>();
 
   const {
     register,
@@ -54,6 +56,15 @@ export default function SpaceUpdate({ params: { id } }: SpaceUpdateProps) {
     },
     [back, id]
   );
+
+  const handleSpaceInfo = useCallback(async () => {
+    const { data } = await http.get<Space>(`/spaces/${id}`);
+    setUser(data);
+  }, [id]);
+
+  useEffect(() => {
+    handleSpaceInfo();
+  }, [handleSpaceInfo]);
 
   return (
     <>

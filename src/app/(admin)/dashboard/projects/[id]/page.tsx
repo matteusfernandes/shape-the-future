@@ -1,36 +1,39 @@
 'use client';
 
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useFieldArray, useForm } from 'react-hook-form';
+import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
 
 import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
 import { http } from '@/lib/http';
 
-import { Content } from './style';
-import { useFieldArray, useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
-import { useRouter } from 'next/navigation';
+import { Content } from '../create/style';
 import { FormTitle } from '../../judget/create/style';
+import { Project } from '@/app/timeline/timelines';
 
 type Space = {
   id: string;
   name: string;
 };
 
-type FormProjectProps = {
-  spaces: Space[];
-};
-
 type InputFormProject = {
   title: string;
   subtitle: string;
   schedule: string;
-  spaceId: string;
-  students: {
+  spaceId: number;
+  students?: {
     name: string;
   }[];
+};
+
+type ProjectUpdateProps = {
+  params: {
+    id: number;
+  };
 };
 
 const schema = yup
@@ -38,24 +41,31 @@ const schema = yup
     title: yup.string().required(),
     subtitle: yup.string().required(),
     schedule: yup.string().required(),
-    spaceId: yup.string().required(),
-    students: yup
-      .array()
-      .of(
-        yup.object({
-          name: yup.string().required()
-        })
-      )
-      .required()
+    spaceId: yup.number().required(),
+    students: yup.array().of(
+      yup.object({
+        name: yup.string().required()
+      })
+    )
   })
   .required();
 
-export function FormProject({ spaces }: FormProjectProps) {
-  const { push } = useRouter();
+export default function ProjectUpdate({ params: { id } }: ProjectUpdateProps) {
+  const { back } = useRouter();
+
+  const [project, setProject] = useState<Project>();
+  const [spaces, setSpaces] = useState<Space[]>();
+
   const { register, handleSubmit, control } = useForm<InputFormProject>({
     resolver: yupResolver(schema),
     defaultValues: {
       students: [{ name: '' }]
+    },
+    values: {
+      title: project?.title as string,
+      subtitle: project?.subtitle as string,
+      schedule: project?.schedule as string,
+      spaceId: project?.spaceId as number
     }
   });
   const { fields, append, remove } = useFieldArray({
@@ -66,15 +76,25 @@ export function FormProject({ spaces }: FormProjectProps) {
   const handleForm = useCallback(
     async (data: InputFormProject) => {
       try {
-        await http.post('/projects', data);
-        toast.success('Projeto cadastrado com Sucesso!');
-        push('/dashboard/projects');
+        await http.put(`/projects/${id}`, data);
+        toast.success('Atualizado com sucesso!');
+        back();
       } catch (error) {
         console.error(error);
       }
     },
-    [push]
+    [back, id]
   );
+
+  const handleProjectDetails = useCallback(async () => {
+    const [projects, spaces] = await Promise.all([
+      http.get(`/projects/${id}`),
+      http.get(`/spaces`)
+    ]);
+
+    setProject(projects.data as Project);
+    setSpaces(spaces.data as Space[]);
+  }, [id]);
 
   const hours = useMemo(() => {
     const hour = [];
@@ -86,9 +106,13 @@ export function FormProject({ spaces }: FormProjectProps) {
     return hour;
   }, []);
 
+  useEffect(() => {
+    handleProjectDetails();
+  }, [handleProjectDetails]);
+
   return (
     <>
-      <FormTitle>Cadastrar novo projeto</FormTitle>
+      <FormTitle>Atualizar projeto</FormTitle>
 
       <Content onSubmit={handleSubmit(handleForm)}>
         <Input
@@ -105,7 +129,7 @@ export function FormProject({ spaces }: FormProjectProps) {
         />
 
         <Input label="Espaço" select required {...register('spaceId')}>
-          {spaces.map((item) => (
+          {spaces?.map((item) => (
             <option key={item.id.toString()} value={item.id}>
               {item.name}
             </option>
@@ -138,7 +162,7 @@ export function FormProject({ spaces }: FormProjectProps) {
           />
         ))}
 
-        <Button label="Enviar" />
+        <Button label="Atualizar" />
       </Content>
     </>
   );

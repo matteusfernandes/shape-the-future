@@ -46,11 +46,13 @@ export const WrapperButtons = styled.div`
 `;
 
 export const AddedButton = styled.button<{ first?: boolean }>`
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border: none;
   background-color: transparent;
-  height: 40px;
-  width: 40px;
-  font-size: 28px;
+  height: 50px;
+  width: 50px;
   cursor: pointer;
 
   &:hover {
@@ -59,10 +61,13 @@ export const AddedButton = styled.button<{ first?: boolean }>`
 `;
 
 export const RemoveButton = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border: none;
   background-color: transparent;
-  height: 40px;
-  width: 40px;
+  height: 50px;
+  width: 50px;
   font-size: 28px;
   bottom: 10px;
   right: 50px;

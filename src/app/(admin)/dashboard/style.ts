@@ -121,12 +121,10 @@ export const FormLine = styled.div`
   }
 
   div {
-    flex: 1;
     display: flex;
     gap: 10;
     overflow: hidden;
     white-space: nowrap;
-    padding-right: 20px;
     cursor: pointer;
 
     span {
@@ -137,4 +135,13 @@ export const FormLine = styled.div`
   &:hover {
     background-color: #f1f1f1;
   }
+`;
+
+export const WrapperButtons = styled.div`
+  flex: 'inherit';
+  padding: 0;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
 `;

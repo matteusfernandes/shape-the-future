@@ -93,7 +93,19 @@ export default function Judget() {
                 {isLoggedAndIsAdmin && (
                   <>
                     <RemoveButton onClick={() => handleVotesDetails(judge)}>
-                      👁️
+                      <svg
+                        viewBox="0 0 24 24"
+                        width="18"
+                        height="18"
+                        stroke="#0066ff"
+                        strokeWidth="2"
+                        fill="none"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                      </svg>
                     </RemoveButton>
 
                     <RemoveButton onClick={() => handleRemoveSpace(judge)}>

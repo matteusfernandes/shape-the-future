@@ -39,7 +39,10 @@ export default function SpaceUpdate({ params: { id } }: SpaceUpdateProps) {
     handleSubmit,
     formState: { errors }
   } = useForm<InputSchema>({
-    resolver: yupResolver(schema)
+    resolver: yupResolver(schema),
+    values: {
+      space: user?.name as string
+    }
   });
 
   const handleSpace = useCallback(
@@ -58,7 +61,7 @@ export default function SpaceUpdate({ params: { id } }: SpaceUpdateProps) {
   );
 
   const handleSpaceInfo = useCallback(async () => {
-    const { data } = await http.get<Space>(`/spaces/${id}`);
+    const { data } = await http.get<Space>(`/spaces/space/${id}`);
     setUser(data);
   }, [id]);
 

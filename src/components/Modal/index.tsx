@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { http } from '@/lib/http';
 import { Judge } from '@/app/timeline/timelines';
@@ -24,6 +24,20 @@ export const Modal = ({ judge, onClose }: ModalProps) => {
 
     setVoteDetails(_.first(data) as VoteDetails);
   }, [judge]);
+
+  const total = useMemo(() => {
+    return Object.keys(
+      _.pick(voteDetails, [
+        'reqCommunication',
+        'reqCreation',
+        'reqIdentify',
+        'reqInteraction',
+        'reqProject'
+      ])
+    ).reduce((acc, next) => {
+      return acc + voteDetails[next] / 10;
+    }, 0);
+  }, [voteDetails]);
 
   useEffect(() => {
     handleVote();
@@ -56,25 +70,29 @@ export const Modal = ({ judge, onClose }: ModalProps) => {
         {_.isEmpty(voteDetails) ? (
           <h3>Jurado ainda não votou!</h3>
         ) : (
-          Object.keys(
-            _.pick(voteDetails, [
-              'reqCommunication',
-              'reqCreation',
-              'reqIdentify',
-              'reqInteraction',
-              'reqProject'
-            ])
-          ).map((vote) => {
-            return (
-              <S.Line key={vote}>
-                <S.Option>{evaluation[vote]}</S.Option>
+          <>
+            {Object.keys(
+              _.pick(voteDetails, [
+                'reqCommunication',
+                'reqCreation',
+                'reqIdentify',
+                'reqInteraction',
+                'reqProject'
+              ])
+            ).map((vote) => {
+              return (
+                <S.Line key={vote}>
+                  <S.Option>{evaluation[vote]}</S.Option>
 
-                <S.Item>{options[vote][voteDetails[vote]]}</S.Item>
+                  <S.Item>{options[vote][voteDetails[vote]]}</S.Item>
 
-                <S.ItemValue>{voteDetails[vote]} pontos</S.ItemValue>
-              </S.Line>
-            );
-          })
+                  <S.ItemValue>{voteDetails[vote] / 10} pontos</S.ItemValue>
+                </S.Line>
+              );
+            })}
+
+            <S.Total>Total: {total} pontos</S.Total>
+          </>
         )}
       </S.Body>
     </S.Wrapper>

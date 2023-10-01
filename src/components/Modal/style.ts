@@ -68,3 +68,10 @@ export const Item = styled.span``;
 export const ItemValue = styled.span`
   margin-left: auto;
 `;
+
+export const Total = styled.h2`
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+  margin-top: 30px;
+`;

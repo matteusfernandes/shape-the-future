@@ -1,0 +1,141 @@
+'use client';
+import { useCallback } from 'react';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import { toast } from 'react-toastify';
+import { http } from '@/lib/http';
+import { Button } from '../Button';
+import {
+  Container,
+  Content,
+  Finalist,
+  Group,
+  GroupItem,
+  GroupTitle,
+  Info,
+  Select
+} from './style';
+import { FinalistsItemProps } from '.';
+
+export function FinalistsItem({
+  background,
+  horizontal,
+  vote,
+  isVote = false,
+  evaluation = false,
+  schedule,
+  title,
+  students,
+  project,
+  group,
+  notes
+}: FinalistsItemProps) {
+  const router = useRouter();
+  const { data: session } = useSession();
+
+  const handleNavigate = useCallback(() => {
+    const urlParams = new URLSearchParams({
+      id: project!.id.toString(),
+      title: project!.title,
+      schedule: project!.schedule
+    });
+
+    router.push(`/evaluations/participant?${urlParams}`);
+  }, [project, router]);
+
+  const handleFinalists = useCallback(async () => {
+    try {
+      const { data } = await http.put(
+        `/projects/finalist/update/${project?.id}`,
+        {
+          finalist: !project?.finalist
+        }
+      );
+      router.refresh();
+      if (data.finalist) {
+        toast.success(`${project?.title} adicionado aos finalistas`);
+      } else {
+        toast.warning(`${project?.title} removido dos finalistas`);
+      }
+    } catch {
+      toast.error(`Erro ao habilitar finalista`);
+    }
+  }, [project, router]);
+
+  const handlePublicVote = useCallback(async () => {
+    try {
+      await http.post(`/vote/public`, {
+        projectId: project?.id
+      });
+      toast.success('Voto computado');
+      router.push('/');
+    } catch (error) {
+      toast.error('Votação ainda não foi iniciada');
+    }
+  }, [project?.id, router]);
+
+  const handleJudgeVote = useCallback(async () => {
+    try {
+      await http.post(`/vote/judge`, {
+        projectId: project?.id
+      });
+      toast.success('Voto computado');
+    } catch (error) {
+      toast.error('Você já votou');
+    }
+  }, [project]);
+
+  return (
+    <Container
+      evaluation={evaluation}
+      onClick={() => evaluation && handleNavigate()}
+    >
+      <Content
+        background={background}
+        horizontal={horizontal}
+        evaluation={evaluation}
+      >
+        {horizontal ? (
+          <Info horizontal>{schedule}H</Info>
+        ) : (
+          <Info>Grupo {group + 1}</Info>
+        )}
+
+        <Info horizontal>{title}</Info>
+
+        {!vote && vote !== 0 && (
+          <Group>
+            {!horizontal && !vote && <GroupTitle>Integrantes:</GroupTitle>}
+            {students &&
+              students.map((student) => (
+                <GroupItem horizontal key={student.id}>
+                  {student.name}
+                </GroupItem>
+              ))}
+          </Group>
+        )}
+
+        {horizontal && !evaluation && <Info horizontal>{notes}</Info>}
+
+        {horizontal && !evaluation && (
+          <Finalist horizontal>
+            <Select active={project?.finalist} onClick={handleFinalists} />{' '}
+            Finalista
+          </Finalist>
+        )}
+
+        {vote && <Info>{vote > 1 ? `${vote} votos` : `${vote} voto`}</Info>}
+      </Content>
+
+      {!horizontal && isVote && (
+        <Button
+          label="Votar"
+          borderless
+          onClick={
+            session?.user.role === 'judge' ? handleJudgeVote : handlePublicVote
+          }
+        />
+      )}
+    </Container>
+  );
+}

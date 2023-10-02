@@ -97,7 +97,7 @@ export default function ProjectUpdate({ params: { id } }: ProjectUpdateProps) {
   }, [id]);
 
   const hours = useMemo(() => {
-    const hour = [];
+    const hour: number[] = [];
 
     for (let x = 8; x <= 18; x++) {
       hour.push(x);

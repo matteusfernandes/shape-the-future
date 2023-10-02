@@ -1,10 +1,12 @@
+//  @typescript-eslint/no-explicit-any
+
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 import { http } from '@/lib/http';
 
-import { FinalistsItem } from '@/components/FinalistsItem';
+import { FinalistsItem } from '@/components/FinalistsItem/FinalistsItem';
 
 import { Button, Container, Content, Selected, WrapperButton } from './style';
 import { useRouter } from 'next/navigation';
@@ -45,7 +47,7 @@ export default function VotesForm() {
       ]);
       setPopular(popular.data);
       setVotes(votes.data[0].active);
-    } catch (error) {
+    } catch (error: any) {
       toast.warning(error!.response!.data!.message);
     }
   }, []);

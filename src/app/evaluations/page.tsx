@@ -3,7 +3,7 @@
 import _ from 'lodash';
 import { useEffect, useCallback, useState, useMemo } from 'react';
 
-import { FinalistsItem } from '@/components/FinalistsItem';
+import { FinalistsItem } from '@/components/FinalistsItem/FinalistsItem';
 import { DayBlock } from '@/components/DayBlock';
 
 import { Container, Content } from './style';

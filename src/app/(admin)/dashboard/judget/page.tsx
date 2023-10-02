@@ -21,12 +21,13 @@ import Link from 'next/link';
 
 type Space = { id: number; name: string };
 
-type Judget = {
+export type Judget = {
   id: number;
   username: string;
   password: string;
   role: string;
   spaceId: number;
+  juryVotes: unknown;
 };
 
 export default function Judget() {

@@ -3,12 +3,18 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { http } from '@/lib/http';
-import { FinalistsItem } from '@/components/FinalistsItem';
+import { FinalistsItem } from '@/components/FinalistsItem/FinalistsItem';
 
 import { Button, Container, Content, WrapperButton } from './style';
 
+type Jury = {
+  id: number;
+  title: string;
+  juryVotes: Array<unknown>;
+};
+
 export default function JuryVotes() {
-  const [judge, setJudge] = useState([]);
+  const [judge, setJudge] = useState<Jury[]>([]);
 
   const handleJudgeVotes = useCallback(async () => {
     try {
@@ -41,7 +47,7 @@ export default function JuryVotes() {
             title={item.title}
             key={item.id.toString()}
             vote={item.juryVotes.length}
-            group={index}
+            group={index.toString()}
           />
         ))}
       </Content>

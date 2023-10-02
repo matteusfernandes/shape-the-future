@@ -1,4 +1,4 @@
-import { HtmlHTMLAttributes, LegacyRef, forwardRef } from 'react';
+import { HtmlHTMLAttributes, forwardRef } from 'react';
 import {
   AddedButton,
   Container,
@@ -14,6 +14,8 @@ type InputProps = HtmlHTMLAttributes<HTMLInputElement | HTMLSelectElement> & {
   label?: string;
   type?: string;
   error?: string;
+  value?: string;
+  disabled?: boolean;
   select?: boolean;
   children?: React.ReactNode;
   addedField?: (() => void) | undefined | null;
@@ -27,17 +29,27 @@ export const Input = forwardRef(function Input(
     children,
     type,
     error,
+    value,
+    disabled,
     addedField,
     removeField,
     ...props
   }: InputProps,
-  ref: LegacyRef<HTMLInputElement | HTMLSelectElement> | undefined
+  ref: any
 ) {
   return (
     <Container>
       {label && <Label>{label}</Label>}
       <WrapperButtons>
-        {!select && <InputText type={type} {...props} ref={ref} />}
+        {!select && (
+          <InputText
+            type={type}
+            {...props}
+            ref={ref}
+            value={value}
+            disabled={disabled}
+          />
+        )}
         {select && (
           <SelectText {...props} ref={ref}>
             {children}

@@ -77,7 +77,7 @@ export function FormProject({ spaces }: FormProjectProps) {
   );
 
   const hours = useMemo(() => {
-    const hour = [];
+    const hour: number[] = [];
 
     for (let x = 8; x <= 18; x++) {
       hour.push(x);

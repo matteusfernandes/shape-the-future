@@ -3,7 +3,7 @@
 import { useMemo } from 'react';
 
 import { Button, Container, Content, WrapperButton } from './style';
-import { FinalistsItem } from '@/components/FinalistsItem';
+import { FinalistsItem } from '@/components/FinalistsItem/FinalistsItem';
 import { Evaluation, Student } from '@/app/evaluations/evaluations';
 
 type NoteProps = {

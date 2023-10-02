@@ -12,6 +12,7 @@ import {
   WrapperTitle
 } from './style';
 import { Student } from '@/app/timeline/timelines';
+import _ from 'lodash';
 
 type Hour = {
   id: number;
@@ -78,8 +79,8 @@ export function TimelineItem({
                   {students
                     .filter(
                       (student) =>
-                        student.spaceId === spaceId &&
-                        hour.id === student.projectId
+                        _.isEqual(student.spaceId, spaceId) &&
+                        _.isEqual(student.projectId, hour.id)
                     )
                     .map((item) => item.name)
                     .join(' | ')}

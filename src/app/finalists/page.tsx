@@ -1,4 +1,4 @@
-import { FinalistsItem } from '@/components/FinalistsItem';
+import { FinalistsItem } from '@/components/FinalistsItem/FinalistsItem';
 import { Container, ContainerEmpty, Info } from './style';
 import { http } from '@/lib/http';
 import _ from 'lodash';

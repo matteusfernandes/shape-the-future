@@ -128,7 +128,7 @@ export const Finalist = styled.h3<{ horizontal: boolean }>`
     `}
 `;
 
-export const Select = styled.div<{ active: boolean }>`
+export const Select = styled.div<{ active?: boolean }>`
   border: 3px #ccc solid;
   min-height: 25px;
   min-width: 25px;

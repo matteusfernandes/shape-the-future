@@ -1,4 +1,10 @@
+'use client';
+
 import { useState, useMemo } from 'react';
+import _ from 'lodash';
+
+import { Student } from '@/app/timeline/timelines';
+
 import {
   Container,
   ContentHourSpeak,
@@ -11,8 +17,6 @@ import {
   WrapperHour,
   WrapperTitle
 } from './style';
-import { Student } from '@/app/timeline/timelines';
-import _ from 'lodash';
 
 type Hour = {
   id: number;

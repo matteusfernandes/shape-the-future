@@ -15,6 +15,7 @@ import {
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import Link from 'next/link';
+import { useRole } from '@/hooks/useRole';
 
 type Project = {
   id: number;
@@ -28,6 +29,7 @@ type Project = {
 type Space = { id: number; name: string };
 
 export default function Projects() {
+  const { isAdmin } = useRole();
   const [projects, setProjects] = useState<Project[]>([]);
   const [spaces, setSpaces] = useState<Space[]>([]);
 
@@ -95,21 +97,23 @@ export default function Projects() {
                     </svg>
                   </Link>
 
-                  <RemoveButton onClick={() => handleRemoveSpace(project)}>
-                    <svg
-                      viewBox="0 0 24 24"
-                      width="18"
-                      height="18"
-                      stroke="red"
-                      strokeWidth="2"
-                      fill="none"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <line x1="18" y1="6" x2="6" y2="18"></line>
-                      <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                  </RemoveButton>
+                  {isAdmin ? (
+                    <RemoveButton onClick={() => handleRemoveSpace(project)}>
+                      <svg
+                        viewBox="0 0 24 24"
+                        width="18"
+                        height="18"
+                        stroke="red"
+                        strokeWidth="2"
+                        fill="none"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                      </svg>
+                    </RemoveButton>
+                  ) : null}
                 </WrapperButtons>
               </FormLine>
             );

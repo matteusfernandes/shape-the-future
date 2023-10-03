@@ -58,14 +58,12 @@ export default function ProjectUpdate({ params: { id } }: ProjectUpdateProps) {
 
   const { register, handleSubmit, control } = useForm<InputFormProject>({
     resolver: yupResolver(schema),
-    defaultValues: {
-      students: [{ name: '' }]
-    },
     values: {
       title: project?.title as string,
       subtitle: project?.subtitle as string,
       schedule: project?.schedule as string,
-      spaceId: project?.spaceId as number
+      spaceId: project?.spaceId as number,
+      students: project?.students
     }
   });
   const { fields, append, remove } = useFieldArray({

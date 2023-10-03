@@ -1,3 +1,5 @@
+'use client';
+
 import styled from 'styled-components';
 
 export const Container = styled.div`
@@ -5,7 +7,7 @@ export const Container = styled.div`
   grid-template-columns: repeat(2, 1fr);
 `;
 
-export const DayButton = styled.button`
+export const DayButton = styled.button<{ active?: boolean }>`
   background-color: ${({ theme }) => theme.COLORS.BLUE[200]};
   color: ${({ theme }) => theme.COLORS.WHITE[900]};
   font-size: 18px;

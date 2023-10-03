@@ -13,6 +13,7 @@ export interface Project {
   schedule: string;
   finalist: boolean;
   spaceId: number;
+  students?: Student[];
 }
 
 export interface Judge {

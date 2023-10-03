@@ -76,7 +76,7 @@ export const ContentMobileRoute = styled.span`
 
 export const Hamburguer = styled.div`
   height: 55px;
-  width: 90px;
+  width: 55px;
   padding: 10px;
   display: flex;
   justify-content: center;

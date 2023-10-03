@@ -1,12 +1,30 @@
-import { http } from '@/lib/http';
+'use client';
 
-import { TimelineSpaces } from './spaces';
-import { Timeline } from './timelines';
+import { useTimeline } from '@/hooks/useTimeline';
 
-export default async function Timeline() {
-  const { data } = await http.get<Timeline[]>('/spaces/projects');
+import { TimelineItem } from '@/components/TimelineItem';
+import { DayBlock } from '@/components/DayBlock';
 
-  console.log(data);
+import { Container, Content } from './style';
 
-  return <TimelineSpaces spaces={data} />;
+export default function Timeline() {
+  const { spacesFiltered } = useTimeline();
+
+  return (
+    <Container>
+      <Content>
+        {spacesFiltered.map((space) => (
+          <TimelineItem
+            key={space.id}
+            spaceId={space.id}
+            title={space.name}
+            hours={space.projects}
+            students={space.students}
+          />
+        ))}
+      </Content>
+
+      <DayBlock />
+    </Container>
+  );
 }

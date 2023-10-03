@@ -10,6 +10,7 @@ import { FinalistsItem } from '@/components/FinalistsItem/FinalistsItem';
 
 import { Button, Container, Content, Selected, WrapperButton } from './style';
 import { useRouter } from 'next/navigation';
+import { AxiosError } from 'axios';
 
 export interface PopularVotes {
   id: number;
@@ -47,8 +48,10 @@ export default function VotesForm() {
       ]);
       setPopular(popular.data);
       setVotes(votes.data[0].active);
-    } catch (error: any) {
-      toast.warning(error!.response!.data!.message);
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        toast.warning(error?.response?.data?.message);
+      }
     }
   }, []);
 

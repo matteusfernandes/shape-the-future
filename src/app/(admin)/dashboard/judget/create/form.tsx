@@ -12,6 +12,8 @@ import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
 import { http } from '@/lib/http';
 import { useRouter } from 'next/navigation';
+import { useRole } from '@/hooks/useRole';
+import { ROLES } from '@/constants';
 
 type JudgetProps = {
   name: string;
@@ -21,17 +23,20 @@ type JudgetProps = {
 type InputProps = {
   username: string;
   password: string;
-  spaceId: number;
+  spaceId?: number;
+  role?: string;
 };
 
 const schema = yup.object({
   username: yup.string().required(),
   password: yup.string().required(),
-  spaceId: yup.number().required()
+  spaceId: yup.number(),
+  role: yup.string()
 });
 
 export function Form({ data }: { data: JudgetProps[] }) {
   const { back } = useRouter();
+  const { isAdmin } = useRole();
 
   const {
     handleSubmit,
@@ -45,13 +50,13 @@ export function Form({ data }: { data: JudgetProps[] }) {
     async (data: InputProps) => {
       try {
         await http.post('/user', {
-          ...data,
-          role: 'judge'
+          role: 'judge',
+          ...data
         });
         toast.success('Cadastrado com Sucesso');
         back();
       } catch (error) {
-        /* empty */
+        toast.error('Error ao cadastrar');
       }
     },
     [back]
@@ -59,7 +64,7 @@ export function Form({ data }: { data: JudgetProps[] }) {
 
   return (
     <>
-      <FormTitle>Cadastrar novo Jurado</FormTitle>
+      <FormTitle>Cadastrar novo {isAdmin ? 'Usuário' : 'Jurado'}</FormTitle>
 
       <Container onSubmit={handleSubmit(handleDataSubmit)}>
         <Content>
@@ -76,6 +81,21 @@ export function Form({ data }: { data: JudgetProps[] }) {
             error={errors?.password?.message}
             {...register('password')}
           />
+          {isAdmin ? (
+            <Input
+              label="Role"
+              select
+              error={errors?.role?.message}
+              {...register('role')}
+            >
+              <option>Selecionar role</option>
+              {Object.keys(ROLES)?.map((role) => (
+                <option key={role} value={role}>
+                  {role}
+                </option>
+              ))}
+            </Input>
+          ) : null}
 
           <Input
             label="Espaço"

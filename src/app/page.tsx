@@ -2,6 +2,7 @@ import _ from 'lodash';
 import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
 
+import { http } from '@/lib/http';
 import { authOptions } from './api/auth/[...nextauth]/route';
 
 import {
@@ -22,6 +23,14 @@ export default async function Home() {
   const isAdminOrStaff = ['admin', 'staff'].includes(
     session?.user?.role as string
   );
+
+  http.interceptors.request.use(async (config) => {
+    if (!_.isEmpty(session?.user)) {
+      config.headers.Authorization = `${session?.user.jwt}`;
+    }
+
+    return config;
+  });
 
   if (!_.isEmpty(session?.user) && isAdminOrStaff) {
     return redirect('/dashboard');

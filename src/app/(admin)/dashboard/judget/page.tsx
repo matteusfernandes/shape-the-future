@@ -2,7 +2,6 @@
 
 import _ from 'lodash';
 import { useCallback, useEffect, useState } from 'react';
-import { useSession } from 'next-auth/react';
 import { toast } from 'react-toastify';
 
 import { http } from '@/lib/http';
@@ -18,6 +17,7 @@ import {
   WrapperContent
 } from '../style';
 import Link from 'next/link';
+import { useRole } from '@/hooks/useRole';
 
 type Space = { id: number; name: string };
 
@@ -31,10 +31,10 @@ export type Judget = {
 };
 
 export default function Judget() {
+  const { isAdmin } = useRole();
   const [showModal, setShowModal] = useState<Judget | null>(null);
   const [judget, setJudget] = useState<Judget[]>([]);
   const [spaces, setSpaces] = useState<Space[]>([]);
-  const { data: session } = useSession();
 
   const handleJudgeAndSpaces = useCallback(async () => {
     const [user, spaces] = await Promise.all([
@@ -81,9 +81,6 @@ export default function Judget() {
         <ContentForm>
           {judget?.map((judge) => {
             const spaceProject = spaces.find((s) => s?.id === judge?.id);
-            const isLoggedAndIsAdmin =
-              !_.isEqual(session?.user?.id, judge?.id?.toString()) &&
-              _.isEqual(session?.user?.role, 'admin');
 
             return (
               <FormLine key={judge?.id?.toString()}>
@@ -113,40 +110,38 @@ export default function Judget() {
                     </svg>
                   </Link>
 
-                  {isLoggedAndIsAdmin && (
-                    <>
-                      <RemoveButton onClick={() => handleVotesDetails(judge)}>
-                        <svg
-                          viewBox="0 0 24 24"
-                          width="18"
-                          height="18"
-                          stroke="#0066ff"
-                          strokeWidth="2"
-                          fill="none"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                          <circle cx="12" cy="12" r="3"></circle>
-                        </svg>
-                      </RemoveButton>
+                  <RemoveButton onClick={() => handleVotesDetails(judge)}>
+                    <svg
+                      viewBox="0 0 24 24"
+                      width="18"
+                      height="18"
+                      stroke="#0066ff"
+                      strokeWidth="2"
+                      fill="none"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                      <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                  </RemoveButton>
 
-                      <RemoveButton onClick={() => handleRemoveSpace(judge)}>
-                        <svg
-                          viewBox="0 0 24 24"
-                          width="18"
-                          height="18"
-                          stroke="red"
-                          strokeWidth="2"
-                          fill="none"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <line x1="18" y1="6" x2="6" y2="18"></line>
-                          <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
-                      </RemoveButton>
-                    </>
+                  {isAdmin && (
+                    <RemoveButton onClick={() => handleRemoveSpace(judge)}>
+                      <svg
+                        viewBox="0 0 24 24"
+                        width="18"
+                        height="18"
+                        stroke="red"
+                        strokeWidth="2"
+                        fill="none"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                      </svg>
+                    </RemoveButton>
                   )}
                 </WrapperButtons>
               </FormLine>

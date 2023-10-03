@@ -1,18 +1,19 @@
+'use client';
+
+import { useTimeline } from '@/hooks/useTimeline';
 import { Container, DayButton } from './style';
 
-export function DayBlock({
-  dayOne = 'Bloco 1',
-  dayTwo = 'Bloco 2',
-  block,
-  setBlock
-}) {
+export function DayBlock() {
+  const { block, setBlock } = useTimeline();
+
   return (
     <Container>
       <DayButton type="button" active={block} onClick={() => setBlock(true)}>
-        {dayOne}
+        Bloco 1
       </DayButton>
+
       <DayButton type="button" active={!block} onClick={() => setBlock(false)}>
-        {dayTwo}
+        Bloco 2
       </DayButton>
     </Container>
   );

@@ -13,10 +13,12 @@ import {
 } from './style';
 import { toast } from 'react-toastify';
 import Link from 'next/link';
+import { useRole } from '@/hooks/useRole';
 
 export type Space = { id: number; name: string };
 
 export default function Dashboard() {
+  const { isAdmin } = useRole();
   const [data, setData] = useState<Space[]>([]);
 
   const handleGetSpace = useCallback(async () => {
@@ -48,7 +50,9 @@ export default function Dashboard() {
       <ContentForm>
         {data?.map((space) => (
           <FormLine key={space?.id?.toString()}>
-            <span>{space?.name}</span>
+            <span style={{ textTransform: 'capitalize' }}>
+              {space?.name.toLowerCase()}
+            </span>
 
             <WrapperButtons>
               <Link href={`/dashboard/space/${space?.id}`}>
@@ -67,21 +71,23 @@ export default function Dashboard() {
                 </svg>
               </Link>
 
-              <RemoveButton onClick={() => handleRemoveSpace(space)}>
-                <svg
-                  viewBox="0 0 24 24"
-                  width="18"
-                  height="18"
-                  stroke="red"
-                  strokeWidth="2"
-                  fill="none"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <line x1="18" y1="6" x2="6" y2="18"></line>
-                  <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-              </RemoveButton>
+              {isAdmin ? (
+                <RemoveButton onClick={() => handleRemoveSpace(space)}>
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="18"
+                    height="18"
+                    stroke="red"
+                    strokeWidth="2"
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </RemoveButton>
+              ) : null}
             </WrapperButtons>
           </FormLine>
         ))}

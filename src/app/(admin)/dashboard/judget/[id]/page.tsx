@@ -13,6 +13,9 @@ import { Input } from '@/components/Input';
 import { http } from '@/lib/http';
 import { useRouter } from 'next/navigation';
 import { Space } from '../../page';
+import { AxiosError } from 'axios';
+import { useRole } from '@/hooks/useRole';
+import { ROLES } from '@/constants';
 
 type Judget = {
   id: number;
@@ -26,12 +29,14 @@ type InputProps = {
   username: string;
   password?: string;
   spaceId: number;
+  role?: string;
 };
 
 const schema = yup.object({
   username: yup.string().required(),
   password: yup.string(),
-  spaceId: yup.number().required()
+  spaceId: yup.number().required(),
+  role: yup.string()
 });
 
 type UpdateJudgetProps = {
@@ -41,6 +46,7 @@ type UpdateJudgetProps = {
 };
 
 export default function UpdateJudget({ params: { id } }: UpdateJudgetProps) {
+  const { isAdmin } = useRole();
   const { back } = useRouter();
   const [judget, setJudget] = useState<Judget>();
   const [spaces, setSpaces] = useState<Space[]>();
@@ -53,7 +59,8 @@ export default function UpdateJudget({ params: { id } }: UpdateJudgetProps) {
     resolver: yupResolver(schema),
     values: {
       username: judget?.username as string,
-      spaceId: judget?.spaceId as number
+      spaceId: judget?.spaceId as number,
+      role: judget?.role as string
     }
   });
 
@@ -61,13 +68,14 @@ export default function UpdateJudget({ params: { id } }: UpdateJudgetProps) {
     async (data: InputProps) => {
       try {
         await http.put(`/user/${id}`, {
-          ...data,
-          role: 'judge'
+          ...data
         });
         toast.success('Atualizado com Sucesso');
         back();
       } catch (error) {
-        /* empty */
+        if (error instanceof AxiosError) {
+          toast.error(error?.response?.data?.message as string);
+        }
       }
     },
     [back, id]
@@ -100,20 +108,28 @@ export default function UpdateJudget({ params: { id } }: UpdateJudgetProps) {
           />
 
           <Input
-            label="Senha antiga"
-            placeholder="Senha do usuário"
-            type="password"
-            value={judget?.password}
-            disabled
-          />
-
-          <Input
             label="Nova senha"
             placeholder="Digite uma nova senha caso queira alterar"
             type="password"
             error={errors?.password?.message}
             {...register('password')}
           />
+
+          {isAdmin ? (
+            <Input
+              label="Role"
+              select
+              error={errors?.role?.message}
+              {...register('role')}
+            >
+              <option>Selecionar role</option>
+              {Object.keys(ROLES)?.map((role) => (
+                <option key={role} value={role}>
+                  {role}
+                </option>
+              ))}
+            </Input>
+          ) : null}
 
           <Input
             label="Espaço"

@@ -16,13 +16,19 @@ export default async function DashboardLayoutRoot({
     <ContainerDashboard>
       <MenuDashboard>
         <h3>cadastro</h3>
-        <Link href="/dashboard">Espaços</Link>
-        <Link href="/dashboard/judget">
-          {session?.user?.role?.toLowerCase() === 'admin'
-            ? 'Usuários'
-            : 'Jurados'}
-        </Link>
-        <Link href="/dashboard/projects">Projetos</Link>
+        {session?.user?.role?.toLowerCase() === 'admin' ? (
+          <>
+            <Link href="/dashboard/judget">Usuários</Link>
+            <Link href="/dashboard">Espaços</Link>
+            <Link href="/dashboard/projects">Projetos</Link>
+          </>
+        ) : (
+          <>
+            <Link href="/dashboard">Espaços</Link>
+            <Link href="/dashboard/judget">Jurados</Link>
+            <Link href="/dashboard/projects">Projetos</Link>
+          </>
+        )}
       </MenuDashboard>
 
       <ContentDashboard>{children}</ContentDashboard>

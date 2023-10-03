@@ -16,6 +16,7 @@ import { Space } from '../../page';
 import { AxiosError } from 'axios';
 import { useRole } from '@/hooks/useRole';
 import { ROLES } from '@/constants';
+import _ from 'lodash';
 
 type Judget = {
   id: number;
@@ -28,14 +29,14 @@ type Judget = {
 type InputProps = {
   username: string;
   password?: string;
-  spaceId: number;
+  spaceId?: number;
   role?: string;
 };
 
 const schema = yup.object({
   username: yup.string().required(),
   password: yup.string(),
-  spaceId: yup.number().required(),
+  spaceId: yup.number(),
   role: yup.string()
 });
 
@@ -52,6 +53,7 @@ export default function UpdateJudget({ params: { id } }: UpdateJudgetProps) {
   const [spaces, setSpaces] = useState<Space[]>();
 
   const {
+    watch,
     handleSubmit,
     register,
     formState: { errors }
@@ -66,6 +68,19 @@ export default function UpdateJudget({ params: { id } }: UpdateJudgetProps) {
 
   const handleDataSubmit = useCallback(
     async (data: InputProps) => {
+      if (data?.role === 'judge' && data?.spaceId === 0) {
+        toast.error('Juiz precisa de um espaço!');
+        return;
+      }
+
+      if (data?.spaceId === 0) {
+        delete data?.spaceId;
+      }
+
+      if (_.isEmpty(data.password)) {
+        delete data.password;
+      }
+
       try {
         await http.put(`/user/${id}`, {
           ...data
@@ -131,19 +146,21 @@ export default function UpdateJudget({ params: { id } }: UpdateJudgetProps) {
             </Input>
           ) : null}
 
-          <Input
-            label="Espaço"
-            select
-            error={errors?.spaceId?.message}
-            {...register('spaceId')}
-          >
-            <option>Selecionar espaço</option>
-            {spaces?.map((space) => (
-              <option key={space?.id.toString()} value={space?.id}>
-                {space?.name}
-              </option>
-            ))}
-          </Input>
+          {_.isEqual(watch('role'), 'judge') ? (
+            <Input
+              label="Espaço"
+              select
+              error={errors?.spaceId?.message}
+              {...register('spaceId')}
+            >
+              <option value={0}>Selecionar espaço</option>
+              {spaces?.map((space) => (
+                <option key={space?.id.toString()} value={space?.id}>
+                  {space?.name}
+                </option>
+              ))}
+            </Input>
+          ) : null}
 
           <Button label="Atualizar" />
         </Content>

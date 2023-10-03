@@ -1,9 +1,7 @@
-import _ from 'lodash';
-import { getServerSession } from 'next-auth';
-import { redirect } from 'next/navigation';
+'use client';
 
-import { http } from '@/lib/http';
-import { authOptions } from './api/auth/[...nextauth]/route';
+import _ from 'lodash';
+import { redirect } from 'next/navigation';
 
 import {
   Columns,
@@ -17,26 +15,22 @@ import {
   RightFooter,
   Title
 } from './style';
+import { useSession } from 'next-auth/react';
+import { useRole } from '@/hooks/useRole';
 
-export default async function Home() {
-  const session = await getServerSession(authOptions);
-  const isAdminOrStaff = ['admin', 'staff'].includes(
-    session?.user?.role as string
-  );
+export default function Home() {
+  const { data: session } = useSession();
+  const { isAdmin, isStaff } = useRole();
 
-  http.interceptors.request.use(async (config) => {
-    if (!_.isEmpty(session?.user)) {
-      config.headers.Authorization = `${session?.user.jwt}`;
-    }
+  if (!_.isEmpty(session?.user) && isAdmin) {
+    return redirect('/dashboard/judget');
+  }
 
-    return config;
-  });
-
-  if (!_.isEmpty(session?.user) && isAdminOrStaff) {
+  if (!_.isEmpty(session?.user) && isStaff) {
     return redirect('/dashboard');
   }
 
-  if (!_.isEmpty(session?.user) && !isAdminOrStaff) {
+  if (!_.isEmpty(session?.user) && !isAdmin && !isStaff) {
     return redirect('/evaluations');
   }
 

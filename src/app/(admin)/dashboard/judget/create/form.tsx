@@ -14,6 +14,7 @@ import { http } from '@/lib/http';
 import { useRouter } from 'next/navigation';
 import { useRole } from '@/hooks/useRole';
 import { ROLES } from '@/constants';
+import _ from 'lodash';
 
 type JudgetProps = {
   name: string;
@@ -39,6 +40,7 @@ export function Form({ data }: { data: JudgetProps[] }) {
   const { isAdmin } = useRole();
 
   const {
+    watch,
     handleSubmit,
     register,
     formState: { errors }
@@ -48,6 +50,15 @@ export function Form({ data }: { data: JudgetProps[] }) {
 
   const handleDataSubmit = useCallback(
     async (data: InputProps) => {
+      if (data?.role === 'judge' && data?.spaceId === 0) {
+        toast.error('Juiz precisa de um espaço!');
+        return;
+      }
+
+      if (data?.spaceId === 0) {
+        delete data?.spaceId;
+      }
+
       try {
         await http.post('/user', {
           role: 'judge',
@@ -97,19 +108,21 @@ export function Form({ data }: { data: JudgetProps[] }) {
             </Input>
           ) : null}
 
-          <Input
-            label="Espaço"
-            select
-            error={errors?.spaceId?.message}
-            {...register('spaceId')}
-          >
-            <option>Selecionar espaço</option>
-            {data?.map((item) => (
-              <option key={item?.id.toString()} value={item?.id}>
-                {item?.name}
-              </option>
-            ))}
-          </Input>
+          {_.isEqual(watch('role'), 'judge') ? (
+            <Input
+              label="Espaço"
+              select
+              error={errors?.spaceId?.message}
+              {...register('spaceId')}
+            >
+              <option value={0}>Selecionar espaço</option>
+              {data?.map((item) => (
+                <option key={item?.id.toString()} value={item?.id}>
+                  {item?.name}
+                </option>
+              ))}
+            </Input>
+          ) : null}
 
           <Button label="Enviar" />
         </Content>

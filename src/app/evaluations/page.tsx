@@ -11,10 +11,11 @@ import { BLOCK1, BLOCK2 } from '@/constants';
 import { http } from '@/lib/http';
 import { useSession } from 'next-auth/react';
 import { Evaluation } from './evaluations';
+import { useTimeline } from '@/hooks/useTimeline';
 
 export default function EvaluationBlocks() {
   const { data: session } = useSession();
-  const [block, setBlock] = useState(true);
+  const { block } = useTimeline();
   const [projects, setProjects] = useState<Evaluation[]>([]);
 
   const handleProjects = useCallback(async () => {
@@ -36,7 +37,7 @@ export default function EvaluationBlocks() {
 
   return (
     <Container>
-      <DayBlock setBlock={setBlock} block={block} />
+      <DayBlock />
 
       <Content>
         {projectsFiltered

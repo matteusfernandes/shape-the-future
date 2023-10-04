@@ -47,7 +47,7 @@ type UpdateJudgetProps = {
 };
 
 export default function UpdateJudget({ params: { id } }: UpdateJudgetProps) {
-  const { isAdmin } = useRole();
+  const { isAdmin, isStaff } = useRole();
   const { back } = useRouter();
   const [judget, setJudget] = useState<Judget>();
   const [spaces, setSpaces] = useState<Space[]>();
@@ -68,6 +68,12 @@ export default function UpdateJudget({ params: { id } }: UpdateJudgetProps) {
 
   const handleDataSubmit = useCallback(
     async (data: InputProps) => {
+      if (isStaff) {
+        _.assign(data, {
+          role: 'judge'
+        });
+      }
+
       if (_.isEqual(data.role, 'judge') && data.spaceId === 0) {
         toast.error('Juiz precisa de um espaço');
         return;
@@ -103,7 +109,7 @@ export default function UpdateJudget({ params: { id } }: UpdateJudgetProps) {
         }
       }
     },
-    [back, id]
+    [back, id, isStaff]
   );
 
   const handleData = useCallback(async () => {

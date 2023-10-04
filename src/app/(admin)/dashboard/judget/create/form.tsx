@@ -37,7 +37,7 @@ const schema = yup.object({
 
 export function Form({ data }: { data: JudgetProps[] }) {
   const { back } = useRouter();
-  const { isAdmin } = useRole();
+  const { isAdmin, isStaff } = useRole();
 
   const {
     watch,
@@ -50,6 +50,12 @@ export function Form({ data }: { data: JudgetProps[] }) {
 
   const handleDataSubmit = useCallback(
     async (data: InputProps) => {
+      if (isStaff) {
+        _.assign(data, {
+          role: 'judge'
+        });
+      }
+
       if (_.isEqual(data.role, 'judge') && data.spaceId === 0) {
         toast.error('Juiz precisa de um espaço');
         return;
@@ -72,7 +78,7 @@ export function Form({ data }: { data: JudgetProps[] }) {
         toast.error('Error ao cadastrar');
       }
     },
-    [back]
+    [back, isStaff]
   );
 
   return (
@@ -112,7 +118,7 @@ export function Form({ data }: { data: JudgetProps[] }) {
             </Input>
           ) : null}
 
-          {_.isEqual(watch('role'), 'judge') ? (
+          {_.isEqual(watch('role'), 'judge') || isStaff ? (
             <Input
               label="Espaço"
               select

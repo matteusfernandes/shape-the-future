@@ -63,7 +63,9 @@ export const Option = styled.h3`
   font-weight: bold;
 `;
 
-export const Item = styled.span``;
+export const Item = styled.span`
+  flex: 1;
+`;
 
 export const ItemValue = styled.span`
   margin-left: auto;
@@ -73,5 +75,6 @@ export const Total = styled.h2`
   font-size: 18px;
   font-weight: bold;
   color: #333;
-  margin-top: 30px;
+  margin-top: 10px;
+  margin-bottom: 30px;
 `;

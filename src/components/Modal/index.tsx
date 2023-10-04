@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { http } from '@/lib/http';
 import { Judge } from '@/app/timeline/timelines';
@@ -13,21 +13,31 @@ type ModalProps = {
 };
 
 type VoteDetails = {
-  [key: string]: number;
+  id: number;
+  projectId: number;
+  reqCommunication: number;
+  reqCreation: number;
+  reqIdentify: number;
+  reqInteraction: number;
+  reqProject: number;
+  userId: number;
+  project: {
+    title: string;
+  };
 };
 
 export const Modal = ({ judge, onClose }: ModalProps) => {
-  const [voteDetails, setVoteDetails] = useState<VoteDetails>({});
+  const [voteDetails, setVoteDetails] = useState<VoteDetails[]>([]);
 
   const handleVote = useCallback(async () => {
     const { data } = await http.get(`/vote/${judge.id}`);
 
-    setVoteDetails(_.first(data) as VoteDetails);
+    setVoteDetails(data as VoteDetails[]);
   }, [judge]);
 
-  const total = useMemo(() => {
+  const total = useCallback((details) => {
     return Object.keys(
-      _.pick(voteDetails, [
+      _.pick(details, [
         'reqCommunication',
         'reqCreation',
         'reqIdentify',
@@ -35,9 +45,9 @@ export const Modal = ({ judge, onClose }: ModalProps) => {
         'reqProject'
       ])
     ).reduce((acc, next) => {
-      return acc + voteDetails[next] / 10;
+      return acc + details[next] / 10;
     }, 0);
-  }, [voteDetails]);
+  }, []);
 
   useEffect(() => {
     handleVote();
@@ -71,27 +81,33 @@ export const Modal = ({ judge, onClose }: ModalProps) => {
           <h3>Jurado ainda não votou!</h3>
         ) : (
           <>
-            {Object.keys(
-              _.pick(voteDetails, [
-                'reqCommunication',
-                'reqCreation',
-                'reqIdentify',
-                'reqInteraction',
-                'reqProject'
-              ])
-            ).map((vote) => {
-              return (
-                <S.Line key={vote}>
-                  <S.Option>{evaluation[vote]}</S.Option>
+            {voteDetails.map((details) => (
+              <>
+                <S.Title>{details?.project?.title}</S.Title>
 
-                  <S.Item>{options[vote][voteDetails[vote]]}</S.Item>
+                {Object.keys(
+                  _.pick(details, [
+                    'reqCommunication',
+                    'reqCreation',
+                    'reqIdentify',
+                    'reqInteraction',
+                    'reqProject'
+                  ])
+                ).map((vote) => {
+                  return (
+                    <S.Line key={vote}>
+                      <S.Option>{evaluation[vote]}</S.Option>
 
-                  <S.ItemValue>{voteDetails[vote] / 10} pontos</S.ItemValue>
-                </S.Line>
-              );
-            })}
+                      <S.Item>{options[vote][details[vote]]}</S.Item>
 
-            <S.Total>Total: {total} pontos</S.Total>
+                      <S.ItemValue>{details[vote] / 10}</S.ItemValue>
+                    </S.Line>
+                  );
+                })}
+
+                <S.Total>total de pontos: {total(details)}</S.Total>
+              </>
+            ))}
           </>
         )}
       </S.Body>

@@ -44,7 +44,7 @@ type TitleProps = {
 export const Title = styled.h2<TitleProps>`
   color: ${({ theme, show }) =>
     show ? theme.COLORS.BLUE[200] : theme.COLORS.WHITE[900]};
-  font-size: 22px;
+  font-size: 18px;
   font-weight: 700;
   transition: all ease-in-out 0.5s;
 `;
@@ -99,16 +99,19 @@ export const Content = styled.div`
 `;
 
 export const ContentHourSpeak = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
   color: ${({ theme }) => theme.COLORS.WHITE[900]};
-  margin: 20px 10px;
-  border-bottom: 2px ${({ theme }) => theme.COLORS.WHITE[900]} solid;
-  padding-bottom: 20px;
-  text-align: center;
+  border-bottom: 0.5px ${({ theme }) => theme.COLORS.WHITE[900]} solid;
+  padding: 10px;
 `;
 
 export const WrapperHour = styled.div`
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  gap: 5px;
+  align-items: flex-start;
 `;
 
 export const Hour = styled.h3`
@@ -118,12 +121,13 @@ export const Hour = styled.h3`
 `;
 
 export const TitleSpeak = styled.span`
-  font-size: 12px;
+  font-size: 16px;
+  font-weight: bold;
   text-transform: uppercase;
+  line-height: 22px;
 `;
 
 export const Speaker = styled.span`
-  display: block;
-  font-size: 10px;
-  margin-top: 10px;
+  font-size: 12px;
+  line-height: 22px;
 `;

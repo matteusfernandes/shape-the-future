@@ -5,10 +5,15 @@ import { useTimeline } from '@/hooks/useTimeline';
 import { TimelineItem } from '@/components/TimelineItem';
 import { DayBlock } from '@/components/DayBlock';
 
-import { Container, Content } from './style';
+import { Container, Content, LoadingContent } from './style';
+import _ from 'lodash';
 
 export default function Timeline() {
-  const { spacesFiltered } = useTimeline();
+  const { spacesFiltered, block, setBlock } = useTimeline();
+
+  if (_.isEmpty(spacesFiltered)) {
+    return <LoadingContent>Carregando...</LoadingContent>;
+  }
 
   return (
     <Container>
@@ -24,7 +29,7 @@ export default function Timeline() {
         ))}
       </Content>
 
-      <DayBlock />
+      <DayBlock block={block} setBlock={setBlock} />
     </Container>
   );
 }

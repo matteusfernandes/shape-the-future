@@ -1,11 +1,8 @@
 'use client';
 
-import { useTimeline } from '@/hooks/useTimeline';
 import { Container, DayButton } from './style';
 
-export function DayBlock() {
-  const { block, setBlock } = useTimeline();
-
+export function DayBlock({ block, setBlock }) {
   return (
     <Container>
       <DayButton type="button" active={block} onClick={() => setBlock(true)}>

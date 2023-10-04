@@ -11,11 +11,13 @@ import { BLOCK1, BLOCK2 } from '@/constants';
 import { http } from '@/lib/http';
 import { useSession } from 'next-auth/react';
 import { Evaluation } from './evaluations';
-import { useTimeline } from '@/hooks/useTimeline';
+import { useRole } from '@/hooks/useRole';
+import { LoadingContent } from '../timeline/style';
 
 export default function EvaluationBlocks() {
   const { data: session } = useSession();
-  const { block } = useTimeline();
+  const { isAdmin } = useRole();
+  const [block, setBlock] = useState(true);
   const [projects, setProjects] = useState<Evaluation[]>([]);
 
   const handleProjects = useCallback(async () => {
@@ -37,27 +39,31 @@ export default function EvaluationBlocks() {
 
   return (
     <Container>
-      <DayBlock />
+      <DayBlock block={block} setBlock={setBlock} />
+
+      {_.isEmpty(projectsFiltered) ? (
+        <LoadingContent>Sem projeto para avaliar</LoadingContent>
+      ) : null}
 
       <Content>
         {projectsFiltered
           ?.filter((project) =>
-            _.isEqual(session?.user.role, 'admin')
-              ? true
-              : project.spaceId === session?.user.spaceId
+            isAdmin ? true : _.isEqual(project.spaceId, session?.user.spaceId)
           )
-          .map((project) => (
-            <FinalistsItem
-              key={project.id}
-              project={project}
-              schedule={project.schedule}
-              title={project.title}
-              students={project.students}
-              horizontal
-              evaluation
-              group={``}
-            />
-          ))}
+          .map((project) => {
+            return (
+              <FinalistsItem
+                key={project.id}
+                project={project}
+                schedule={project.schedule}
+                title={project.title}
+                students={project.students}
+                horizontal
+                evaluation
+                group={``}
+              />
+            );
+          })}
       </Content>
     </Container>
   );

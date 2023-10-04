@@ -9,7 +9,6 @@ import { http } from '@/lib/http';
 import { FinalistsItem } from '@/components/FinalistsItem/FinalistsItem';
 
 import { Button, Container, Content, Selected, WrapperButton } from './style';
-import { useRouter } from 'next/navigation';
 import { AxiosError } from 'axios';
 
 export interface PopularVotes {
@@ -36,9 +35,8 @@ export interface PublicVote {
 }
 
 export default function VotesForm() {
-  const { refresh } = useRouter();
   const [popular, setPopular] = useState<PopularVotes[]>([]);
-  const [votes, setVotes] = useState(true);
+  const [votes, setVotes] = useState(false);
 
   const loadVotesAndPopular = useCallback(async () => {
     try {
@@ -51,6 +49,8 @@ export default function VotesForm() {
     } catch (error) {
       if (error instanceof AxiosError) {
         toast.warning(error?.response?.data?.message);
+        setPopular([]);
+        setVotes(true);
       }
     }
   }, []);
@@ -59,10 +59,10 @@ export default function VotesForm() {
     const { data } = await http.put('/vote', {
       active: !votes
     });
+
     toast.success(data.message);
     await loadVotesAndPopular();
-    await refresh();
-  }, [loadVotesAndPopular, refresh, votes]);
+  }, [loadVotesAndPopular, votes]);
 
   const popularFiltered = useMemo(() => {
     return popular.sort(
@@ -78,7 +78,7 @@ export default function VotesForm() {
     <Container>
       <WrapperButton>
         <Button>Votos Populares</Button>
-        <Selected active={votes} onClick={() => handleActive()}>
+        <Selected active={votes} onClick={handleActive}>
           {votes ? 'ativo' : 'inativo'}
         </Selected>
       </WrapperButton>
@@ -89,7 +89,7 @@ export default function VotesForm() {
             title={item.title}
             key={item.id.toString()}
             vote={item.publicVotes.length}
-            group={index.toString()}
+            group={index}
           />
         ))}
       </Content>

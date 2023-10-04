@@ -54,7 +54,7 @@ export const MyLink = styled(Link)<MyLinkProps>`
   }
 `;
 
-export const ContentMobile = styled.div`
+export const ContentMobile = styled(Link)`
   width: 100%;
   @media (min-width: 960px) {
     display: none;
@@ -76,7 +76,7 @@ export const ContentMobileRoute = styled.span`
 
 export const Hamburguer = styled.div`
   height: 55px;
-  width: 55px;
+  min-width: 55px;
   padding: 10px;
   display: flex;
   justify-content: center;

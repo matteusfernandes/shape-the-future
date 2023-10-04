@@ -50,20 +50,22 @@ export function Form({ data }: { data: JudgetProps[] }) {
 
   const handleDataSubmit = useCallback(
     async (data: InputProps) => {
-      if (data?.role === 'judge' && data?.spaceId === 0) {
-        toast.error('Juiz precisa de um espaço!');
+      if (_.isEqual(data.role, 'judge') && data.spaceId === 0) {
+        toast.error('Juiz precisa de um espaço');
         return;
       }
 
-      if (data?.spaceId === 0) {
-        delete data?.spaceId;
+      if (data.spaceId === 0) {
+        delete data.spaceId;
+      }
+
+      if (_.isEqual(data.role, 'Selecionar role')) {
+        toast.error('Escolha a role do usuário');
+        return;
       }
 
       try {
-        await http.post('/user', {
-          role: 'judge',
-          ...data
-        });
+        await http.post('/user', data);
         toast.success('Cadastrado com Sucesso');
         back();
       } catch (error) {
@@ -85,6 +87,7 @@ export function Form({ data }: { data: JudgetProps[] }) {
             error={errors?.username?.message}
             {...register('username')}
           />
+
           <Input
             label="Senha"
             placeholder="Senha do usuário"
@@ -92,6 +95,7 @@ export function Form({ data }: { data: JudgetProps[] }) {
             error={errors?.password?.message}
             {...register('password')}
           />
+
           {isAdmin ? (
             <Input
               label="Role"

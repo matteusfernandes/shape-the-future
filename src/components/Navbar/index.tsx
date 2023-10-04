@@ -9,6 +9,8 @@ import { Logo } from '../Logo';
 import {
   Container,
   ContentMenu,
+  ContentMobile,
+  ContentMobileRoute,
   Hamburguer,
   Line,
   Menu,
@@ -82,6 +84,10 @@ export function Navbar() {
       <MyLink {...isActive('/finalists')}>Finalistas</MyLink>
 
       <AuthButton {...isActive('/signin', 'left')} />
+
+      <ContentMobile href="/finalists">
+        <ContentMobileRoute>VOTAR</ContentMobileRoute>
+      </ContentMobile>
 
       <Menu show={showMenu}>
         <MenuClose onClick={() => setShowMenu(false)}>

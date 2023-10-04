@@ -82,7 +82,7 @@ export default function Judget() {
           {judget
             .filter((judge) => (isStaff ? judge.role === 'judge' : true))
             ?.map((judge) => {
-              const spaceProject = spaces.find((s) => s?.id === judge?.id);
+              const spaceProject = spaces.find((s) => s.id === judge.spaceId);
 
               return (
                 <FormLine key={judge?.id?.toString()}>

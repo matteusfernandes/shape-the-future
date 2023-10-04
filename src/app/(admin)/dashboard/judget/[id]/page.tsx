@@ -61,30 +61,40 @@ export default function UpdateJudget({ params: { id } }: UpdateJudgetProps) {
     resolver: yupResolver(schema),
     values: {
       username: judget?.username as string,
-      spaceId: judget?.spaceId as number,
-      role: judget?.role as string
+      spaceId: judget?.spaceId || 0,
+      role: (judget?.role as string) || 'Selecionar role'
     }
   });
 
   const handleDataSubmit = useCallback(
     async (data: InputProps) => {
-      if (data?.role === 'judge' && data?.spaceId === 0) {
-        toast.error('Juiz precisa de um espaço!');
+      if (_.isEqual(data.role, 'judge') && data.spaceId === 0) {
+        toast.error('Juiz precisa de um espaço');
         return;
-      }
-
-      if (data?.spaceId === 0) {
-        delete data?.spaceId;
       }
 
       if (_.isEmpty(data.password)) {
         delete data.password;
       }
 
+      if (data.spaceId === 0) {
+        delete data.spaceId;
+      }
+
+      if (!_.isEqual(data.role, 'judge')) {
+        delete data.spaceId;
+      }
+
+      if (
+        _.isEqual(data.role, '0') ||
+        _.isEqual(data.role, 'Selecionar role')
+      ) {
+        toast.error('Escolha a role do usuário');
+        return;
+      }
+
       try {
-        await http.put(`/user/${id}`, {
-          ...data
-        });
+        await http.put(`/user/${id}`, data);
         toast.success('Atualizado com Sucesso');
         back();
       } catch (error) {
@@ -150,7 +160,7 @@ export default function UpdateJudget({ params: { id } }: UpdateJudgetProps) {
             <Input
               label="Espaço"
               select
-              error={errors?.spaceId?.message}
+              error={errors?.spaceId?.message as string}
               {...register('spaceId')}
             >
               <option value={0}>Selecionar espaço</option>

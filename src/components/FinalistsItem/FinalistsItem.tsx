@@ -98,7 +98,7 @@ export function FinalistsItem({
         {horizontal ? (
           <Info horizontal>{schedule}H</Info>
         ) : (
-          <Info>Grupo {group + 1}</Info>
+          <Info>Grupo {group ? group + 1 : null}</Info>
         )}
 
         <Info horizontal>{title}</Info>

@@ -13,6 +13,6 @@ export type FinalistsItemProps = {
   students?: Student[];
   project?: Evaluation;
   getProject?: () => void;
-  group: number;
+  group?: number;
   notes?: number;
 };

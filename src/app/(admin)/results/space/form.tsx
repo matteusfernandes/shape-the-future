@@ -124,7 +124,6 @@ export function FormFinalistsVotes({
             project={project}
             notes={project?.nota?.finalNote}
             horizontal
-            group={''}
             isVote={vote}
           />
         ))}

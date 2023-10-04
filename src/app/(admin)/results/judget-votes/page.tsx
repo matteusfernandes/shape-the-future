@@ -47,7 +47,7 @@ export default function JuryVotes() {
             title={item.title}
             key={item.id.toString()}
             vote={item.juryVotes.length}
-            group={index.toString()}
+            group={index}
           />
         ))}
       </Content>

@@ -1,11 +1,9 @@
 'use client';
 
-import _ from 'lodash';
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 
 import { http } from '@/lib/http';
-import { Modal } from '@/components/Modal';
 
 import {
   ContentForm,
@@ -18,6 +16,8 @@ import {
 } from '../style';
 import Link from 'next/link';
 import { useRole } from '@/hooks/useRole';
+import _ from 'lodash';
+import { LoadingContent } from '@/app/timeline/style';
 
 type Space = { id: number; name: string };
 
@@ -32,7 +32,6 @@ export type Judget = {
 
 export default function Judget() {
   const { isAdmin, isStaff } = useRole();
-  const [showModal, setShowModal] = useState<Judget | null>(null);
   const [judget, setJudget] = useState<Judget[]>([]);
   const [spaces, setSpaces] = useState<Space[]>([]);
 
@@ -55,20 +54,16 @@ export default function Judget() {
     [handleJudgeAndSpaces]
   );
 
-  const handleVotesDetails = useCallback((user: Judget | null) => {
-    setShowModal(user);
-  }, []);
-
   useEffect(() => {
     handleJudgeAndSpaces();
   }, [handleJudgeAndSpaces]);
 
+  if (_.isEmpty(judget)) {
+    return <LoadingContent>Carregando...</LoadingContent>;
+  }
+
   return (
     <>
-      {!_.isEmpty(showModal) ? (
-        <Modal judge={showModal} onClose={() => handleVotesDetails(null)} />
-      ) : null}
-
       <WrapperContent>
         <HeaderContent>
           <h3>Todos os {isAdmin ? 'Usuários' : 'Jurados'}</h3>
@@ -112,7 +107,7 @@ export default function Judget() {
                       </svg>
                     </Link>
 
-                    <RemoveButton onClick={() => handleVotesDetails(judge)}>
+                    <Link href={`/dashboard/judget/projects/${judge.id}`}>
                       <svg
                         viewBox="0 0 24 24"
                         width="18"
@@ -126,7 +121,7 @@ export default function Judget() {
                         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                         <circle cx="12" cy="12" r="3"></circle>
                       </svg>
-                    </RemoveButton>
+                    </Link>
 
                     {isAdmin && (
                       <RemoveButton onClick={() => handleRemoveSpace(judge)}>

@@ -16,6 +16,8 @@ import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import Link from 'next/link';
 import { useRole } from '@/hooks/useRole';
+import { LoadingContent } from '@/app/timeline/style';
+import _ from 'lodash';
 
 type Project = {
   id: number;
@@ -55,6 +57,10 @@ export default function Projects() {
   useEffect(() => {
     getProjectsAndSpaces();
   }, [getProjectsAndSpaces]);
+
+  if (_.isEmpty(projects)) {
+    return <LoadingContent>Carregando...</LoadingContent>;
+  }
 
   return (
     <WrapperContent>

@@ -1,16 +1,8 @@
 import _ from 'lodash';
-import { useCallback, useEffect, useState } from 'react';
-
-import { http } from '@/lib/http';
-import { Judge } from '@/app/timeline/timelines';
+import { useCallback } from 'react';
 
 import * as S from './style';
 import { evaluation, options } from './constants';
-
-type ModalProps = {
-  judge: Judge;
-  onClose: () => void;
-};
 
 type VoteDetails = {
   id: number;
@@ -26,18 +18,15 @@ type VoteDetails = {
   };
 };
 
-export const Modal = ({ judge, onClose }: ModalProps) => {
-  const [voteDetails, setVoteDetails] = useState<VoteDetails[]>([]);
+type ModalProps = {
+  showModal: VoteDetails;
+  onClose: () => void;
+};
 
-  const handleVote = useCallback(async () => {
-    const { data } = await http.get(`/vote/${judge.id}`);
-
-    setVoteDetails(data as VoteDetails[]);
-  }, [judge]);
-
-  const total = useCallback((details) => {
+export const Modal = ({ showModal, onClose }: ModalProps) => {
+  const total = useCallback((showModal) => {
     return Object.keys(
-      _.pick(details, [
+      _.pick(showModal, [
         'reqCommunication',
         'reqCreation',
         'reqIdentify',
@@ -45,13 +34,9 @@ export const Modal = ({ judge, onClose }: ModalProps) => {
         'reqProject'
       ])
     ).reduce((acc, next) => {
-      return acc + details[next] / 10;
+      return acc + showModal[next] / 10;
     }, 0);
   }, []);
-
-  useEffect(() => {
-    handleVote();
-  }, [handleVote]);
 
   return (
     <S.Wrapper>
@@ -75,41 +60,31 @@ export const Modal = ({ judge, onClose }: ModalProps) => {
       </S.Header>
 
       <S.Body>
-        <S.Name>Jurado: {judge?.username}</S.Name>
+        <S.Name>{showModal?.project?.title}</S.Name>
 
-        {_.isEmpty(voteDetails) ? (
-          <h3>Jurado ainda não votou!</h3>
-        ) : (
-          <>
-            {voteDetails.map((details) => (
-              <>
-                <S.Title>{details?.project?.title}</S.Title>
+        <>
+          {Object.keys(
+            _.pick(showModal, [
+              'reqCommunication',
+              'reqCreation',
+              'reqIdentify',
+              'reqInteraction',
+              'reqProject'
+            ])
+          ).map((vote) => {
+            return (
+              <S.Line key={vote}>
+                <S.Option>{evaluation[vote]}</S.Option>
 
-                {Object.keys(
-                  _.pick(details, [
-                    'reqCommunication',
-                    'reqCreation',
-                    'reqIdentify',
-                    'reqInteraction',
-                    'reqProject'
-                  ])
-                ).map((vote) => {
-                  return (
-                    <S.Line key={vote}>
-                      <S.Option>{evaluation[vote]}</S.Option>
+                <S.Item>{options[vote][showModal[vote]]}</S.Item>
 
-                      <S.Item>{options[vote][details[vote]]}</S.Item>
+                <S.ItemValue>{showModal[vote] / 10}</S.ItemValue>
+              </S.Line>
+            );
+          })}
 
-                      <S.ItemValue>{details[vote] / 10}</S.ItemValue>
-                    </S.Line>
-                  );
-                })}
-
-                <S.Total>total de pontos: {total(details)}</S.Total>
-              </>
-            ))}
-          </>
-        )}
+          <S.Total>total de pontos: {total(showModal)}</S.Total>
+        </>
       </S.Body>
     </S.Wrapper>
   );

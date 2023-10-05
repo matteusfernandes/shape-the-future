@@ -20,5 +20,5 @@ export const LoadingContent = styled.div`
   width: 100%;
   height: 480px;
   font-size: 18px;
-  color: #fff;
+  color: #666;
 `;

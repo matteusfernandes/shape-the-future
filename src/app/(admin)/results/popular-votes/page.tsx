@@ -10,6 +10,8 @@ import { FinalistsItem } from '@/components/FinalistsItem/FinalistsItem';
 
 import { Button, Container, Content, Selected, WrapperButton } from './style';
 import { AxiosError } from 'axios';
+import { LoadingContent } from '@/app/timeline/style';
+import _ from 'lodash';
 
 export interface PopularVotes {
   id: number;
@@ -73,6 +75,10 @@ export default function VotesForm() {
   useEffect(() => {
     loadVotesAndPopular();
   }, [loadVotesAndPopular]);
+
+  if (_.isEmpty(popular)) {
+    return <LoadingContent>Carregando...</LoadingContent>;
+  }
 
   return (
     <Container>

@@ -6,6 +6,8 @@ import { http } from '@/lib/http';
 import { FinalistsItem } from '@/components/FinalistsItem/FinalistsItem';
 
 import { Button, Container, Content, WrapperButton } from './style';
+import { LoadingContent } from '@/app/timeline/style';
+import _ from 'lodash';
 
 type Jury = {
   id: number;
@@ -34,6 +36,10 @@ export default function JuryVotes() {
   useEffect(() => {
     handleJudgeVotes();
   }, [handleJudgeVotes]);
+
+  if (_.isEmpty(judge)) {
+    return <LoadingContent>Carregando...</LoadingContent>;
+  }
 
   return (
     <Container>

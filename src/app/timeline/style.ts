@@ -18,7 +18,7 @@ export const LoadingContent = styled.div`
   align-items: center;
   justify-content: center;
   width: 100%;
-  height: 480px;
+  min-height: 480px;
   font-size: 18px;
   color: #666;
 `;

@@ -76,10 +76,6 @@ export default function VotesForm() {
     loadVotesAndPopular();
   }, [loadVotesAndPopular]);
 
-  if (_.isEmpty(popular)) {
-    return <LoadingContent>Carregando...</LoadingContent>;
-  }
-
   return (
     <Container>
       <WrapperButton>
@@ -90,14 +86,18 @@ export default function VotesForm() {
       </WrapperButton>
 
       <Content>
-        {popularFiltered.map((item, index) => (
-          <FinalistsItem
-            title={item.title}
-            key={item.id.toString()}
-            vote={item.publicVotes.length}
-            group={index}
-          />
-        ))}
+        {_.isEmpty(popular) ? (
+          <LoadingContent>Votação iniciada</LoadingContent>
+        ) : (
+          popularFiltered.map((item, index) => (
+            <FinalistsItem
+              title={item.title}
+              key={item.id.toString()}
+              vote={item.publicVotes.length}
+              group={index}
+            />
+          ))
+        )}
       </Content>
     </Container>
   );

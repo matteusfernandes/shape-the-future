@@ -150,3 +150,35 @@ export const ContentMenu = styled.div`
     display: none;
   }
 `;
+
+export const MenuDashboard = styled.div`
+  border-bottom: 1px ${({ theme }) => theme.COLORS.BLUE[200]} solid;
+  display: flex !important;
+  flex-flow: column nowrap;
+  padding: 20px;
+  gap: 20px;
+
+  h3 {
+    font-size: 18px;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+
+  a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    font-size: 14px;
+    color: #333;
+
+    &::before {
+      border: 1px #333 solid;
+      border-radius: 7.5px;
+      content: '';
+      display: inline-block;
+      height: 15px;
+      width: 15px;
+      margin-right: 20px;
+    }
+  }
+`;

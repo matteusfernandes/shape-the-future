@@ -7,7 +7,12 @@ export const ContainerDashboard = styled.div`
   flex: 1;
   display: grid;
   grid-template-columns: 200px 1fr;
+
+  @media (max-width: 960px) {
+    grid-template-columns: 1fr;
+  }
 `;
+
 export const MenuDashboard = styled.div`
   display: flex;
   flex: 1;
@@ -39,6 +44,10 @@ export const MenuDashboard = styled.div`
       width: 15px;
       margin-right: 20px;
     }
+  }
+
+  @media (max-width: 960px) {
+    display: none;
   }
 `;
 

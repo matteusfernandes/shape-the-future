@@ -15,9 +15,11 @@ import {
   Line,
   Menu,
   MenuClose,
-  MyLink
+  MyLink,
+  MenuDashboard
 } from './style';
 import { useSession } from 'next-auth/react';
+import Link from 'next/link';
 
 export function Navbar() {
   const { data: session } = useSession();
@@ -41,23 +43,32 @@ export function Navbar() {
   const adminRenderHeader = useMemo(() => {
     return (
       <>
-        <MyLink {...isActive('/dashboard')}>Dashboard</MyLink>
-
         {session?.user?.role === 'staff' ? (
-          <MyLink {...isActive('', 'left')} isStaff>
+          <MyLink
+            {...isActive('', 'left')}
+            isStaff
+            onClick={() => setShowMenu(false)}
+          >
             Resultados
           </MyLink>
         ) : (
-          <MyLink {...isActive('/results', 'left')}>Resultados</MyLink>
+          <MyLink
+            {...isActive('/results', 'left')}
+            onClick={() => setShowMenu(false)}
+          >
+            Resultados
+          </MyLink>
         )}
 
         <Logo />
         {session?.user?.role === 'staff' ? (
-          <MyLink {...isActive('')} isStaff>
+          <MyLink {...isActive('')} isStaff onClick={() => setShowMenu(false)}>
             Cronograma
           </MyLink>
         ) : (
-          <MyLink {...isActive('/timeline')}>Cronograma</MyLink>
+          <MyLink {...isActive('/timeline')} onClick={() => setShowMenu(false)}>
+            Cronograma
+          </MyLink>
         )}
 
         <AuthButton {...isActive('/signin', 'left')} />
@@ -65,25 +76,30 @@ export function Navbar() {
     );
   }, [isActive, session?.user?.role]);
 
-  if (isAdminOrStaff) {
-    return <Container>{adminRenderHeader}</Container>;
-  }
-
   return (
     <Container>
-      {!_.isEmpty(session) ? (
-        <MyLink {...isActive('/evaluations')}>Avaliação</MyLink>
+      {isAdminOrStaff ? (
+        <>
+          <MyLink {...isActive('/dashboard')}>Dashboard</MyLink>
+          {adminRenderHeader}
+        </>
       ) : (
-        <MyLink {...isActive('/')}>Home</MyLink>
+        <>
+          {!_.isEmpty(session) ? (
+            <MyLink {...isActive('/evaluations')}>Avaliação</MyLink>
+          ) : (
+            <MyLink {...isActive('/')}>Home</MyLink>
+          )}
+
+          <MyLink {...isActive('/timeline', 'left')}>Cronograma</MyLink>
+
+          <Logo />
+
+          <MyLink {...isActive('/finalists')}>Finalistas</MyLink>
+
+          <AuthButton {...isActive('/signin', 'left')} />
+        </>
       )}
-
-      <MyLink {...isActive('/timeline', 'left')}>Cronograma</MyLink>
-
-      <Logo />
-
-      <MyLink {...isActive('/finalists')}>Finalistas</MyLink>
-
-      <AuthButton {...isActive('/signin', 'left')} />
 
       <ContentMobile href="/finalists">
         <ContentMobileRoute>VOTAR</ContentMobileRoute>
@@ -96,20 +112,86 @@ export function Navbar() {
 
         <ContentMenu>
           {isAdminOrStaff ? (
-            adminRenderHeader
+            <>
+              <MyLink
+                {...isActive('/dashboard')}
+                onClick={() => setShowMenu(false)}
+              >
+                Dashboard
+              </MyLink>
+
+              <MenuDashboard>
+                {session?.user?.role?.toLowerCase() === 'admin' ? (
+                  <>
+                    <Link
+                      href="/dashboard/judget"
+                      onClick={() => setShowMenu(false)}
+                    >
+                      Usuários
+                    </Link>
+                    <Link href="/dashboard" onClick={() => setShowMenu(false)}>
+                      Espaços
+                    </Link>
+                    <Link
+                      href="/dashboard/projects"
+                      onClick={() => setShowMenu(false)}
+                    >
+                      Projetos
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    <Link href="/dashboard" onClick={() => setShowMenu(false)}>
+                      Espaços
+                    </Link>
+                    <Link
+                      href="/dashboard/judget"
+                      onClick={() => setShowMenu(false)}
+                    >
+                      Jurados
+                    </Link>
+                    <Link
+                      href="/dashboard/projects"
+                      onClick={() => setShowMenu(false)}
+                    >
+                      Projetos
+                    </Link>
+                  </>
+                )}
+              </MenuDashboard>
+
+              {adminRenderHeader}
+            </>
           ) : (
             <>
               {!_.isEmpty(session) ? (
-                <MyLink {...isActive('/evaluations')}>Avaliação</MyLink>
+                <MyLink
+                  {...isActive('/evaluations')}
+                  onClick={() => setShowMenu(false)}
+                >
+                  Avaliação
+                </MyLink>
               ) : (
-                <MyLink {...isActive('/')}>Home</MyLink>
+                <MyLink {...isActive('/')} onClick={() => setShowMenu(false)}>
+                  Home
+                </MyLink>
               )}
 
-              <MyLink {...isActive('/timeline', 'left')}>Cronograma</MyLink>
+              <MyLink
+                {...isActive('/timeline', 'left')}
+                onClick={() => setShowMenu(false)}
+              >
+                Cronograma
+              </MyLink>
 
               <Logo />
 
-              <MyLink {...isActive('/finalists')}>Finalistas</MyLink>
+              <MyLink
+                {...isActive('/finalists')}
+                onClick={() => setShowMenu(false)}
+              >
+                Finalistas
+              </MyLink>
 
               <AuthButton {...isActive('/signin', 'left')} />
             </>

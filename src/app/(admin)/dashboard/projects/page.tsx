@@ -5,6 +5,7 @@ import { http } from '@/lib/http';
 import {
   ContentForm,
   FormLine,
+  FormName,
   HeaderButton,
   HeaderContent,
   RemoveButton,
@@ -79,12 +80,14 @@ export default function Projects() {
 
             return (
               <FormLine key={project?.id?.toString()}>
-                <div>
-                  <span>{project?.title}</span> |{' '}
-                  <span>{project?.subtitle}</span> |
-                  <span>{project?.schedule}</span> |{' '}
-                  <span>{spaceProject?.name}</span>
-                </div>
+                <FormName>
+                  <span>
+                    {project?.title.toLowerCase()} |{' '}
+                    {project?.subtitle.toLowerCase()} |{' '}
+                    {project?.schedule.toLowerCase()} |{' '}
+                    {spaceProject?.name.toLowerCase()}
+                  </span>
+                </FormName>
 
                 <WrapperButtons>
                   <Link href={`/dashboard/projects/${project?.id}`}>

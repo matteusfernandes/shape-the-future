@@ -26,4 +26,8 @@ export const Letter = styled.div`
     font-size: 22px;
     border: 0.1px #ffffff3b solid;
   }
+
+  @media (max-width: 360px) {
+    font-size: 18px;
+  }
 `;

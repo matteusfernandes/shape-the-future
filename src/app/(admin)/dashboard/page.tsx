@@ -5,6 +5,7 @@ import { http } from '@/lib/http';
 import {
   ContentForm,
   FormLine,
+  FormName,
   HeaderButton,
   HeaderContent,
   RemoveButton,
@@ -56,9 +57,11 @@ export default function Dashboard() {
       <ContentForm>
         {data?.map((space) => (
           <FormLine key={space?.id?.toString()}>
-            <span style={{ textTransform: 'capitalize' }}>
-              {space?.name.toLowerCase()}
-            </span>
+            <FormName>
+              <span style={{ textTransform: 'capitalize' }}>
+                {space?.name.toLowerCase()}
+              </span>
+            </FormName>
 
             <WrapperButtons>
               <Link href={`/dashboard/space/${space?.id}`}>

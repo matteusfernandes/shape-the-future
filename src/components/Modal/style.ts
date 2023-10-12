@@ -8,12 +8,13 @@ export const Wrapper = styled.div`
   border-radius: 4.5px;
   display: flex;
   flex-flow: column nowrap;
-  height: 480px;
+  min-height: 480px;
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 680px;
+  width: 95%;
+  max-width: 680px;
 `;
 
 export const Header = styled.div`
@@ -58,13 +59,21 @@ export const Line = styled.div`
   width: 100%;
 `;
 
+export const WrapperOption = styled.div`
+  display: flex;
+  flex-flow: column nowrap;
+  gap: 10px;
+`;
+
 export const Option = styled.h3`
-  font-size: 14px;
+  font-size: 12px;
   font-weight: bold;
 `;
 
 export const Item = styled.span`
   flex: 1;
+  font-size: 14px;
+  line-height: 18px;
 `;
 
 export const ItemValue = styled.span`
@@ -72,7 +81,7 @@ export const ItemValue = styled.span`
 `;
 
 export const Total = styled.h2`
-  font-size: 18px;
+  font-size: 16px;
   font-weight: bold;
   color: #333;
   margin-top: 10px;

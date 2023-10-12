@@ -9,6 +9,7 @@ import { Modal } from '@/components/Modal';
 import {
   ContentForm,
   FormLine,
+  FormName,
   HeaderContent,
   WrapperButtons,
   WrapperContent
@@ -68,7 +69,7 @@ export default function Project({ params: { id } }) {
 
       <WrapperContent>
         <HeaderContent>
-          <h3>Todos os Projetos</h3>
+          <h3>Todos os Projetos Votados</h3>
         </HeaderContent>
 
         <ContentForm>
@@ -82,11 +83,12 @@ export default function Project({ params: { id } }) {
 
               return (
                 <FormLine key={project?.id?.toString()}>
-                  <div>
+                  <FormName>
                     <span>
-                      {project?.title} | {project?.subtitle}
+                      {project?.title.toLowerCase()} |{' '}
+                      {project?.subtitle.toLowerCase()}
                     </span>
-                  </div>
+                  </FormName>
 
                   <WrapperButtons onClick={() => handleVotesDetails(votes)}>
                     <svg

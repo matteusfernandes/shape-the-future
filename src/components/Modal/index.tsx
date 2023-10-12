@@ -74,9 +74,11 @@ export const Modal = ({ showModal, onClose }: ModalProps) => {
           ).map((vote) => {
             return (
               <S.Line key={vote}>
-                <S.Option>{evaluation[vote]}</S.Option>
+                <S.WrapperOption>
+                  <S.Option>{evaluation[vote]}</S.Option>
 
-                <S.Item>{options[vote][showModal[vote]]}</S.Item>
+                  <S.Item>{options[vote][showModal[vote]]}</S.Item>
+                </S.WrapperOption>
 
                 <S.ItemValue>{showModal[vote] / 10}</S.ItemValue>
               </S.Line>

@@ -8,6 +8,7 @@ import { http } from '@/lib/http';
 import {
   ContentForm,
   FormLine,
+  FormName,
   HeaderButton,
   HeaderContent,
   RemoveButton,
@@ -81,17 +82,14 @@ export default function Judget() {
 
               return (
                 <FormLine key={judge?.id?.toString()}>
-                  <div>
-                    <span>{judge?.username} | </span>
-
-                    <span>{spaceProject?.name}</span>
-                  </div>
+                  <FormName>
+                    <span>
+                      {judge?.username} | {spaceProject?.name}
+                    </span>
+                  </FormName>
 
                   <WrapperButtons>
-                    <Link
-                      href={`/dashboard/judget/${judge?.id}`}
-                      style={{ width: 30 }}
-                    >
+                    <Link href={`/dashboard/judget/${judge?.id}`}>
                       <svg
                         viewBox="0 0 24 24"
                         width="18"

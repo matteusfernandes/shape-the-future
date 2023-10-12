@@ -99,6 +99,7 @@ export const RemoveButton = styled.button`
   border-radius: 4.5px;
   background: none;
   cursor: pointer;
+  padding: 0;
 
   &:hover {
     opacity: 0.7;
@@ -108,6 +109,7 @@ export const RemoveButton = styled.button`
 export const WrapperContentForm = styled.div`
   max-height: 460px;
   overflow-x: auto;
+  height: 100%;
 `;
 
 export const ContentForm = styled.div`
@@ -115,34 +117,35 @@ export const ContentForm = styled.div`
   flex-flow: column nowrap;
   background-color: #fff;
   overflow-x: auto;
+  height: 100%;
 `;
 
 export const FormLine = styled.div`
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: 1fr;
   border-bottom: 1px #f1f1f1 solid;
   padding: 0 20px;
   height: 50px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  span {
-    font-size: 14px;
-  }
-
-  div {
-    display: flex;
-    gap: 10;
-    overflow: hidden;
-    white-space: nowrap;
-    cursor: pointer;
-
-    span {
-      margin: 0 5px;
-    }
-  }
 
   &:hover {
     background-color: #f1f1f1;
+  }
+`;
+
+export const FormName = styled.div`
+  display: flex;
+  align-items: center;
+  padding-right: 10px;
+  text-transform: capitalize;
+  overflow: hidden;
+  margin-right: 20px;
+
+  span {
+    @media (max-width: 760px) {
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
   }
 `;
 

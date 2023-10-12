@@ -1,12 +1,11 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import _ from 'lodash';
+
 import { http } from '@/lib/http';
 
 import { FinalistsItem } from '@/components/FinalistsItem/FinalistsItem';
 import { Evaluation, Student } from '@/app/evaluations/evaluations';
-import { LoadingContent } from '@/app/timeline/style';
 
 import { Button, Container, Content, WrapperButton } from './style';
 
@@ -120,10 +119,6 @@ export default function FinalistsVotes() {
   useEffect(() => {
     handleProjectsAndVote();
   }, [handleProjectsAndVote]);
-
-  if (_.isEmpty(projects)) {
-    return <LoadingContent>Carregando...</LoadingContent>;
-  }
 
   return (
     <Container>

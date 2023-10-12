@@ -40,16 +40,16 @@ export function TimelineItem({
   const [show, setShow] = useState(false);
 
   const image = useMemo(() => {
-    switch (title) {
-      case 'Espaço Maker':
+    switch (title?.toLowerCase()) {
+      case 'espaço maker':
         return '/images/maker.svg';
-      case 'Laboratório de Biologia':
+      case 'laboratório de biologia (espaço verde)':
         return '/images/biologia.svg';
-      case 'Laboratório de Física':
+      case 'laboratório de física':
         return '/images/fisica.svg';
-      case 'Ateliê de Artes':
+      case 'sala de artes':
         return '/images/atelie.svg';
-      case 'Laboratório de Ciências':
+      case 'techhub':
         return '/images/ciencias.svg';
       default:
         return '/images/biblioteca.svg';

@@ -17,8 +17,6 @@ import {
 } from '../style';
 import Link from 'next/link';
 import { useRole } from '@/hooks/useRole';
-import _ from 'lodash';
-import { LoadingContent } from '@/app/timeline/style';
 
 type Space = { id: number; name: string };
 
@@ -58,10 +56,6 @@ export default function Judget() {
   useEffect(() => {
     handleJudgeAndSpaces();
   }, [handleJudgeAndSpaces]);
-
-  if (_.isEmpty(judget)) {
-    return <LoadingContent>Carregando...</LoadingContent>;
-  }
 
   return (
     <>

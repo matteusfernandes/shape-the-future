@@ -15,8 +15,6 @@ import {
 import { toast } from 'react-toastify';
 import Link from 'next/link';
 import { useRole } from '@/hooks/useRole';
-import { LoadingContent } from '@/app/timeline/style';
-import _ from 'lodash';
 
 export type Space = { id: number; name: string };
 
@@ -41,10 +39,6 @@ export default function Dashboard() {
   useEffect(() => {
     handleGetSpace();
   }, [handleGetSpace]);
-
-  if (_.isEmpty(data)) {
-    return <LoadingContent>Carregando...</LoadingContent>;
-  }
 
   return (
     <WrapperContent>

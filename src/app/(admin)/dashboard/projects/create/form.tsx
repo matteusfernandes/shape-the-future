@@ -25,7 +25,7 @@ type FormProjectProps = {
 
 type InputFormProject = {
   title: string;
-  subtitle: string;
+  subtitle?: string;
   schedule: string;
   spaceId: string;
   students: {
@@ -36,7 +36,7 @@ type InputFormProject = {
 const schema = yup
   .object({
     title: yup.string().required(),
-    subtitle: yup.string().required(),
+    subtitle: yup.string(),
     schedule: yup.string().required(),
     spaceId: yup.string().required(),
     students: yup

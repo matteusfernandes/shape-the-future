@@ -22,7 +22,7 @@ type Space = {
 
 type InputFormProject = {
   title: string;
-  subtitle: string;
+  subtitle?: string;
   schedule: string;
   spaceId: number;
   students?: {
@@ -39,7 +39,7 @@ type ProjectUpdateProps = {
 const schema = yup
   .object({
     title: yup.string().required(),
-    subtitle: yup.string().required(),
+    subtitle: yup.string(),
     schedule: yup.string().required(),
     spaceId: yup.number().required(),
     students: yup.array().of(

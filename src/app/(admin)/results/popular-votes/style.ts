@@ -1,6 +1,10 @@
 import styled, { css } from 'styled-components';
 
-export const Container = styled.div``;
+export const Container = styled.div`
+  flex: 1;
+  display: flex;
+  flex-flow: column nowrap;
+`;
 
 export const WrapperButton = styled.div`
   width: 100%;
@@ -24,14 +28,22 @@ export const Button = styled.button`
     color: ${({ theme }) => theme.COLORS.WHITE[900]};
     background-color: ${({ theme }) => theme.COLORS.BLUE[200]};
   }
+
+  @media (max-width: 768px) {
+    text-align: left;
+    font-size: 22px;
+    padding-left: 10px;
+  }
 `;
 
 export const Content = styled.div`
   flex: 1;
   display: flex;
   overflow-y: auto;
-  overflow: hidden;
-  min-height: 560px;
+
+  @media (min-width: 768px) {
+    min-height: 560px;
+  }
 
   & > div:nth-child(1n) {
     background: #707dbb;
@@ -54,7 +66,7 @@ export const Content = styled.div`
   }
 `;
 
-export const Selected = styled.div<{active?: boolean}>`
+export const Selected = styled.div<{ active?: boolean }>`
   background-color: #151e53;
   border-radius: 25px;
   box-shadow: 0 0 2px #4156af;
@@ -72,6 +84,11 @@ export const Selected = styled.div<{active?: boolean}>`
   font-size: 14px;
   transition: all ease-in-out 0.2s;
   padding: 0 10px;
+
+  @media (max-width: 768px) {
+    top: 15px;
+    right: 10px;
+  }
 
   &::before {
     content: '';

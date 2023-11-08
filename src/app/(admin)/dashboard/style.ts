@@ -126,7 +126,7 @@ export const FormLine = styled.div`
   grid-template-rows: 1fr;
   border-bottom: 1px #f1f1f1 solid;
   padding: 0 20px;
-  height: 50px;
+  min-height: 60px;
 
   &:hover {
     background-color: #f1f1f1;
@@ -144,7 +144,8 @@ export const FormName = styled.div`
   span {
     @media (max-width: 760px) {
       text-overflow: ellipsis;
-      white-space: nowrap;
+      font-size: 12px;
+      line-height: 16px;
     }
   }
 `;

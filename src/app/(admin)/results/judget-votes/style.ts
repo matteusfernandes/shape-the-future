@@ -1,6 +1,10 @@
 import styled from 'styled-components';
 
-export const Container = styled.div``;
+export const Container = styled.div`
+  flex: 1;
+  display: flex;
+  flex-flow: column nowrap;
+`;
 
 export const WrapperButton = styled.div`
   width: 100%;
@@ -29,8 +33,10 @@ export const Content = styled.div`
   flex: 1;
   display: flex;
   overflow-y: auto;
-  overflow: hidden;
-  min-height: 560px;
+
+  @media (min-width: 768px) {
+    min-height: 560px;
+  }
 
   & > div:nth-child(1n) {
     background: #707dbb;

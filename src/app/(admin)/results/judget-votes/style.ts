@@ -32,7 +32,11 @@ export const Button = styled.button`
 export const Content = styled.div`
   flex: 1;
   display: flex;
-  overflow-y: auto;
+  overflow: auto;
+
+  @media (max-width: 768px) {
+    flex-flow: column nowrap;
+  }
 
   @media (min-width: 768px) {
     min-height: 560px;

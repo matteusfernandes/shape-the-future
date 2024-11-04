@@ -12,6 +12,10 @@ export function DayBlock({ block, setBlock }) {
       <DayButton type="button" active={!block} onClick={() => setBlock(false)}>
         Bloco 2
       </DayButton>
+
+      <DayButton type="button" active={!block} onClick={() => setBlock(false)}>
+        Bloco 3
+      </DayButton>
     </Container>
   );
 }

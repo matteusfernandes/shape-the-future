@@ -77,7 +77,10 @@ export default function Judget() {
               <FormLine key={judge?.id?.toString()}>
                 <FormName>
                   <span>
-                    {judge?.username} | {spaceProject?.name}
+                    {judge?.username}
+                    {judge?.role == 'judge'
+                      ? ` | JURADO (${spaceProject?.name})`
+                      : ` | ${judge?.role.toLocaleUpperCase()}`}
                   </span>
                 </FormName>
 
@@ -98,21 +101,23 @@ export default function Judget() {
                     </svg>
                   </Link>
 
-                  <Link href={`/dashboard/judget/projects/${judge.id}`}>
-                    <svg
-                      viewBox="0 0 24 24"
-                      width="18"
-                      height="18"
-                      stroke="#0066ff"
-                      strokeWidth="2"
-                      fill="none"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                      <circle cx="12" cy="12" r="3"></circle>
-                    </svg>
-                  </Link>
+                  {judge?.role == 'judge' && (
+                    <Link href={`/dashboard/judget/projects/${judge.id}`}>
+                      <svg
+                        viewBox="0 0 24 24"
+                        width="18"
+                        height="18"
+                        stroke="#0066ff"
+                        strokeWidth="2"
+                        fill="none"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                      </svg>
+                    </Link>
+                  )}
 
                   {isAdmin && (
                     <RemoveButton onClick={() => handleRemoveSpace(judge)}>

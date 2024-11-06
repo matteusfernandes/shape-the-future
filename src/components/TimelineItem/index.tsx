@@ -43,11 +43,11 @@ export function TimelineItem({
     switch (title?.toLowerCase()) {
       case 'espaço maker':
         return '/images/maker.svg';
-      case 'van gogh 12':
-        return '/images/biologia.svg';
-      case 'van gogh 16':
-        return '/images/fisica.svg';
       case 'van gogh 11':
+        return '/images/biologia.svg';
+      case 'van gogh 12':
+        return '/images/fisica.svg';
+      case 'pátio infantil':
         return '/images/atelie.svg';
       case 'tech-hub':
         return '/images/ciencias.svg';

@@ -7,7 +7,7 @@ import { FinalistsItem } from '@/components/FinalistsItem/FinalistsItem';
 import { DayBlock } from '@/components/DayBlock';
 
 import { Container, Content } from './style';
-import { BLOCK1, BLOCK2 } from '@/constants';
+import { BLOCK1, BLOCK2, BLOCK3 } from '@/constants';
 import { http } from '@/lib/http';
 import { useSession } from 'next-auth/react';
 import { Evaluation } from './evaluations';
@@ -17,7 +17,7 @@ import { LoadingContent } from '../timeline/style';
 export default function EvaluationBlocks() {
   const { data: session } = useSession();
   const { isAdmin } = useRole();
-  const [block, setBlock] = useState(true);
+  const [block, setBlock] = useState(1);
   const [projects, setProjects] = useState<Evaluation[]>([]);
 
   const handleProjects = useCallback(async () => {
@@ -26,11 +26,15 @@ export default function EvaluationBlocks() {
   }, []);
 
   const projectsFiltered = useMemo(() => {
-    return projects?.filter((project) =>
-      block
-        ? BLOCK1.includes(project.schedule)
-        : BLOCK2.includes(project.schedule)
-    );
+    return projects?.filter((project) => {
+      if (block === 1) {
+        return BLOCK1.includes(project.schedule);
+      } else if (block === 2) {
+        return BLOCK2.includes(project.schedule);
+      } else if (block === 3) {
+        return BLOCK3.includes(project.schedule);
+      }
+    });
   }, [block, projects]);
 
   useEffect(() => {

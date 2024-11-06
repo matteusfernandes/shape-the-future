@@ -43,13 +43,13 @@ export function TimelineItem({
     switch (title?.toLowerCase()) {
       case 'espaço maker':
         return '/images/maker.svg';
-      case 'laboratório de biologia (espaço verde)':
+      case 'van gogh 12':
         return '/images/biologia.svg';
-      case 'laboratório de física':
+      case 'van gogh 16':
         return '/images/fisica.svg';
-      case 'sala de artes':
+      case 'van gogh 11':
         return '/images/atelie.svg';
-      case 'techhub':
+      case 'tech-hub':
         return '/images/ciencias.svg';
       default:
         return '/images/biblioteca.svg';

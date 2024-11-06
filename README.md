@@ -1,1 +1,1 @@
-Alteração simples pra vercel rodar.
+ Alteração simples pra vercel rodar.

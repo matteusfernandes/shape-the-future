@@ -40,15 +40,15 @@ export default function Home() {
         <Content>
           <Title>Moldando hoje o mundo de amanhã</Title>
           <Description>
-            Shaping the Future é uma iniciativa do colégio Albert Sabin em
-            parceria com a Global Shapers Network, rede de jovens do Fórum
+            Shaping the Future é uma iniciativa do Colégio Albert Sabin, em
+            parceria com a Global Shapers Community, a rede de jovens do Fórum
             Econômico Mundial, que promove a discussão sobre futuros positivos
-            através do protagonismo dos alunos. Um dia de evento com mais de 80
-            projetos que discutem a quarta revolução industrial, seus impactos e
-            possibilidades. Cada uma das iniciativas foi pensada e desenvolvida,
-            desde o problema e até a solução, por estudantes que se colocaram no
-            papel de agentes transformadores interessados em moldar o mundo no
-            qual desejam viver.
+            através do protagonismo dos alunos. Neste ano, o evento aborda o
+            tema &quot;Global Risk&quot;, incentivando mais de 80 projetos de
+            estudantes a explorarem os riscos globais destacados no Global Risk
+            Report. Em um dia dedicado à inovação e ao pensamento crítico, os
+            jovens discutirão e proporão soluções criativas para enfrentar os
+            desafios de curto e longo prazo que ameaçam o mundo contemporâneo.
           </Description>
         </Content>
 

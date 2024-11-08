@@ -9,13 +9,16 @@ import {
   Container,
   ContentHourSpeak,
   Hour,
-  ImageDiv,
   Speaker,
+  ImageDiv,
   Title,
   TitleSpeak,
   WrapperContent,
   WrapperHour,
-  WrapperTitle
+  WrapperTitle,
+  IconContainer,
+  EffectDiv,
+  Icon
 } from './style';
 
 type Hour = {
@@ -58,13 +61,34 @@ export function TimelineItem({
 
   return (
     <Container onClick={() => setShow((prev) => !prev)}>
-      <WrapperTitle show={show}>
-        <Title show={show}>{title}</Title>
+      <WrapperTitle>
+        <Title>{title}</Title>
       </WrapperTitle>
 
       <WrapperContent show={show}>
         {!show ? (
-          <ImageDiv image={image} show={show} />
+          <ImageDiv image={image} show={show}>
+            <EffectDiv>
+              <IconContainer>
+                <Icon>
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="32"
+                    height="32"
+                    stroke="#fff"
+                    strokeWidth="2"
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>
+                </Icon>
+                <span>VER CRONOGRAMA</span>
+              </IconContainer>
+            </EffectDiv>
+          </ImageDiv>
         ) : (
           hours
             ?.sort(
@@ -94,5 +118,38 @@ export function TimelineItem({
         )}
       </WrapperContent>
     </Container>
+    //     <Container>
+    //       <WrapperTitle>
+    //         <Title>{title}</Title>
+    //       </WrapperTitle>
+
+    //       <WrapperContent>
+    //         {hours
+    //             ?.sort(
+    //               (a, b) =>
+    //                 +a?.schedule.split(':').join('') -
+    //                 +b?.schedule.split(':').join('')
+    //             )
+    //             .map((hour) => (
+    //               <ContentHourSpeak key={hour.id.toString()}>
+    //                 <WrapperHour>
+    //                   <Hour>{hour.schedule}H</Hour>
+    //                   <TitleSpeak>{hour.title}</TitleSpeak>
+    //                 </WrapperHour>
+
+    //                 <Speaker>
+    //                   {students
+    //                     .filter(
+    //                       (student) =>
+    //                         _.isEqual(student.spaceId, spaceId) &&
+    //                         _.isEqual(student.projectId, hour.id)
+    //                     )
+    //                     .map((item) => item.name)
+    //                     .join(' | ')}
+    //                 </Speaker>
+    //               </ContentHourSpeak>
+    //             ))}
+    //       </WrapperContent>
+    //     </Container>
   );
 }

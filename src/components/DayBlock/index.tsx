@@ -10,7 +10,7 @@ export function DayBlock({ block, setBlock }) {
         active={block == 1 ? true : false}
         onClick={() => setBlock(1)}
       >
-        Bloco 1
+        Sessão 1
       </DayButton>
 
       <DayButton
@@ -18,7 +18,7 @@ export function DayBlock({ block, setBlock }) {
         active={block == 2 ? true : false}
         onClick={() => setBlock(2)}
       >
-        Bloco 2
+        Sessão 2
       </DayButton>
 
       <DayButton
@@ -26,7 +26,7 @@ export function DayBlock({ block, setBlock }) {
         active={block == 3 ? true : false}
         onClick={() => setBlock(3)}
       >
-        Bloco 3
+        Sessão 3
       </DayButton>
     </Container>
   );

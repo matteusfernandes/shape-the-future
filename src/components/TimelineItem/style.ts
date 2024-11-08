@@ -101,11 +101,11 @@ export const EffectDiv = styled.div`
   justify-content: space-around;
   align-items: center;
   flex-wrap: wrap;
-  bottom: -120px;
-  position: relative;
+  height: max-content;
+  margin-bottom: 70px;
 
   @media (max-width: 460px) {
-    bottom: -180px;
+    margin-bottom: 10px;
   }
 `;
 
@@ -114,12 +114,6 @@ export const Icon = styled.div`
     content: '';
     display: block;
     position: absolute;
-    left: -2px;
-    right: 153px;
-    top: 190px;
-    bottom: 190px;
-    border-radius: 50%;
-    border: 15px solid #fff;
   }
 
   &::after {
@@ -152,6 +146,7 @@ export const ImageDiv = styled.div<ImageProps>`
   width: 100%;
   display: flex;
   justify-content: center;
+  align-items: flex-end;
   flex-wrap: wrap;
   background: ${({ image }) => image && `url(${image})`};
   background-size: cover;

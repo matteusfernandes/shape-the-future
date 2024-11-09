@@ -1,2 +1,2 @@
- Alteração simples pra vercel rodar. ok
+ Alteração simples pra vercel rodar.
 

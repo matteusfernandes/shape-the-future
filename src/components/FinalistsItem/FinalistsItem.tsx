@@ -1,5 +1,5 @@
 'use client';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
@@ -32,6 +32,7 @@ export function FinalistsItem({
 }: FinalistsItemProps) {
   const router = useRouter();
   const { data: session } = useSession();
+  const [isVoting, setIsVoting] = useState(false);
 
   const handleNavigate = useCallback(() => {
     const urlParams = new URLSearchParams({
@@ -63,6 +64,9 @@ export function FinalistsItem({
   }, [project, router]);
 
   const handlePublicVote = useCallback(async () => {
+    if (isVoting) return; // Impede múltiplos cliques enquanto "isVoting" é true
+
+    setIsVoting(true);
     try {
       await http.post(`/vote/public`, {
         projectId: project?.id
@@ -72,7 +76,7 @@ export function FinalistsItem({
     } catch (error) {
       toast.error('Votação ainda não foi iniciada');
     }
-  }, [project?.id, router]);
+  }, [project?.id, router, isVoting]);
 
   const handleJudgeVote = useCallback(async () => {
     try {

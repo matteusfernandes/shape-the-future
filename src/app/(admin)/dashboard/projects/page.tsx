@@ -68,22 +68,42 @@ export default function Projects() {
       </HeaderContent>
 
       <WrapperContentForm>
-        <ContentForm>
+        <ContentForm style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {projects?.map((project) => {
             const spaceProject = spaces.find((s) => s?.id === project?.spaceId);
 
             return (
-              <FormLine key={project?.id?.toString()}>
-                <FormName>
-                  <span>
-                    {project?.title.toLowerCase()} |{' '}
-                    {project?.subtitle.toLowerCase()} |{' '}
-                    {project?.schedule.toLowerCase()} |{' '}
-                    {spaceProject?.name?.toLowerCase() || 'sem espaço'}
-                  </span>
+              <FormLine 
+                key={project?.id?.toString()}
+                style={{
+                  padding: '50px 20px',
+                  backgroundColor: '#f8f9fa',
+                  marginBottom: 0,
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  boxSizing: 'border-box',
+                  width: '100%'
+                }}
+              >
+                <FormName style={{ flex: 1, minWidth: 0, paddingRight: '20px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    <div>
+                      <strong style={{ color: '#141E53', fontSize: '1.05em' }}>
+                        {project?.title}
+                      </strong>
+                    </div>
+                    <div style={{ color: '#555', fontSize: '0.95em' }}>
+                      {project?.subtitle}
+                    </div>
+                    <div style={{ display: 'flex', gap: '16px', fontSize: '0.9em', color: '#666' }}>
+                      <span>⏰ {project?.schedule}</span>
+                      <span>📍 {spaceProject?.name || 'Sem espaço'}</span>
+                    </div>
+                  </div>
                 </FormName>
 
-                <WrapperButtons>
+                <WrapperButtons style={{ flexShrink: 0 }}>
                   <Link href={`/dashboard/projects/${project?.id}`}>
                     <svg
                       viewBox="0 0 24 24"

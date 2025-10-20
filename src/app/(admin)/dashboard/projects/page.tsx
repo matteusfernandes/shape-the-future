@@ -70,7 +70,7 @@ export default function Projects() {
       <WrapperContentForm>
         <ContentForm>
           {projects?.map((project) => {
-            const spaceProject = spaces.find((s) => s?.id === project?.id);
+            const spaceProject = spaces.find((s) => s?.id === project?.spaceId);
 
             return (
               <FormLine key={project?.id?.toString()}>
@@ -79,7 +79,7 @@ export default function Projects() {
                     {project?.title.toLowerCase()} |{' '}
                     {project?.subtitle.toLowerCase()} |{' '}
                     {project?.schedule.toLowerCase()} |{' '}
-                    {spaceProject?.name.toLowerCase()}
+                    {spaceProject?.name?.toLowerCase() || 'sem espaço'}
                   </span>
                 </FormName>
 

@@ -8,13 +8,11 @@ import { Student } from '@/app/timeline/timelines';
 import {
   Container,
   ContentHourSpeak,
-  Hour,
   Speaker,
   ImageDiv,
   Title,
   TitleSpeak,
   WrapperContent,
-  WrapperHour,
   WrapperTitle,
   IconContainer,
   EffectDiv,
@@ -98,10 +96,7 @@ export function TimelineItem({
             )
             .map((hour) => (
               <ContentHourSpeak key={hour.id.toString()}>
-                <WrapperHour>
-                  <Hour>{hour.schedule}H</Hour>
-                  <TitleSpeak>{hour.title}</TitleSpeak>
-                </WrapperHour>
+                <TitleSpeak>{hour.title}</TitleSpeak>
 
                 <Speaker>
                   {students

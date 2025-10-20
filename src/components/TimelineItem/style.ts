@@ -179,33 +179,32 @@ export const Content = styled.div`
 export const ContentHourSpeak = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 8px;
   color: ${({ theme }) => theme.COLORS.WHITE[900]};
   border-bottom: 0.5px ${({ theme }) => theme.COLORS.WHITE[900]} solid;
-  padding: 10px;
-`;
+  padding: 16px 12px;
+  transition: all ease-in-out 0.2s;
 
-export const WrapperHour = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  align-items: flex-start;
-`;
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
 
-export const Hour = styled.h3`
-  font-size: 14px;
-  font-weight: 700;
-  margin-right: 5px;
+  &:last-child {
+    border-bottom: none;
+  }
 `;
 
 export const TitleSpeak = styled.span`
-  font-size: 16px;
-  font-weight: bold;
+  font-size: 18px;
+  font-weight: 700;
   text-transform: uppercase;
-  line-height: 22px;
+  line-height: 24px;
+  letter-spacing: 0.5px;
 `;
 
 export const Speaker = styled.span`
-  font-size: 12px;
-  line-height: 22px;
+  font-size: 13px;
+  line-height: 20px;
+  opacity: 0.95;
+  font-weight: 400;
 `;

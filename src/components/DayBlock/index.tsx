@@ -20,14 +20,6 @@ export function DayBlock({ block, setBlock }) {
       >
         Sessão 2
       </DayButton>
-
-      <DayButton
-        type="button"
-        active={block == 3 ? true : false}
-        onClick={() => setBlock(3)}
-      >
-        Sessão 3
-      </DayButton>
     </Container>
   );
 }

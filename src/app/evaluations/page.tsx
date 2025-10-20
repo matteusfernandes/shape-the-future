@@ -7,7 +7,7 @@ import { FinalistsItem } from '@/components/FinalistsItem/FinalistsItem';
 import { DayBlock } from '@/components/DayBlock';
 
 import { Container, Content } from './style';
-import { BLOCK1, BLOCK2, BLOCK3 } from '@/constants';
+import { BLOCK1, BLOCK2 } from '@/constants';
 import { http } from '@/lib/http';
 import { useSession } from 'next-auth/react';
 import { Evaluation } from './evaluations';
@@ -31,9 +31,8 @@ export default function EvaluationBlocks() {
         return BLOCK1.includes(project.schedule);
       } else if (block === 2) {
         return BLOCK2.includes(project.schedule);
-      } else if (block === 3) {
-        return BLOCK3.includes(project.schedule);
       }
+      return false;
     });
   }, [block, projects]);
 

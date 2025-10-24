@@ -4,12 +4,14 @@ import { useCallback, useState } from 'react';
 import { http } from '@/lib/http';
 import { toast } from 'react-toastify';
 import { useRole } from '@/hooks/useRole';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import {
   WrapperContent,
   HeaderContent
 } from '../style';
 
-type ReportType = 'projects' | 'users' | 'spaces' | 'evaluations' | 'votes';
+type ReportType = 'projects' | 'users' | 'spaces' | 'evaluations' | 'votes' | 'detailed';
 
 interface CSVData {
   [key: string]: string | number | boolean;
@@ -170,6 +172,210 @@ export default function Reports() {
     }
   }, []);
 
+  const generateDetailedReportCSV = useCallback(async () => {
+    setLoading('detailed');
+    try {
+      const { data: projects } = await http.get('/projects');
+      const detailedData: CSVData[] = [];
+
+      projects.forEach((project: Record<string, unknown>) => {
+        const students = project.students as Record<string, unknown>[] | undefined;
+        const notes = project.notes as Record<string, unknown>[] | undefined;
+
+        if (students && students.length > 0) {
+          students.forEach((student: Record<string, unknown>) => {
+            // Calcular média do aluno
+            const studentNotes = notes?.filter((note: Record<string, unknown>) => 
+              note.studentId === student.id
+            ) || [];
+
+            if (studentNotes.length > 0) {
+              studentNotes.forEach((note: Record<string, unknown>, index) => {
+                const reqCommunication = note.reqCommunication as number;
+                const reqIdentify = note.reqIdentify as number;
+                const reqCreation = note.reqCreation as number;
+                const reqInteraction = note.reqInteraction as number;
+                const reqProject = note.reqProject as number;
+
+                const average = (
+                  (reqCommunication + reqIdentify + reqCreation + reqInteraction + reqProject) / 50
+                ).toFixed(2);
+
+                detailedData.push({
+                  'ID do Projeto': project.id as number,
+                  'Nome do Projeto': project.title as string,
+                  'ID do Aluno': student.id as number,
+                  'Nome do Aluno': student.name as string,
+                  'Avaliação Nº': index + 1,
+                  'Comunicação (0-10)': reqCommunication,
+                  'Identificação (0-10)': reqIdentify,
+                  'Criação (0-10)': reqCreation,
+                  'Interação (0-10)': reqInteraction,
+                  'Projeto (0-10)': reqProject,
+                  'Média da Avaliação': average
+                });
+              });
+
+              // Calcular média final do aluno
+              const totalSum = studentNotes.reduce((sum, note: Record<string, unknown>) => {
+                return sum + 
+                  (note.reqCommunication as number) +
+                  (note.reqIdentify as number) +
+                  (note.reqCreation as number) +
+                  (note.reqInteraction as number) +
+                  (note.reqProject as number);
+              }, 0);
+
+              const finalAverage = (totalSum / (studentNotes.length * 50)).toFixed(2);
+
+              detailedData.push({
+                'ID do Projeto': project.id as number,
+                'Nome do Projeto': project.title as string,
+                'ID do Aluno': student.id as number,
+                'Nome do Aluno': student.name as string,
+                'Avaliação Nº': 'MÉDIA FINAL',
+                'Comunicação (0-10)': '',
+                'Identificação (0-10)': '',
+                'Criação (0-10)': '',
+                'Interação (0-10)': '',
+                'Projeto (0-10)': '',
+                'Média da Avaliação': finalAverage
+              });
+            }
+          });
+        }
+      });
+
+      if (detailedData.length === 0) {
+        toast.warning('Nenhum dado de avaliação encontrado');
+        return;
+      }
+
+      downloadCSV(detailedData, 'relatorio_geral_detalhado');
+      toast.success('Relatório detalhado CSV gerado com sucesso!');
+    } catch (error) {
+      toast.error('Erro ao gerar relatório detalhado');
+    } finally {
+      setLoading(null);
+    }
+  }, []);
+
+  const generateDetailedReportPDF = useCallback(async () => {
+    setLoading('detailed');
+    try {
+      const { data: projects } = await http.get('/projects');
+      
+      const doc = new jsPDF();
+      let currentY = 20;
+
+      doc.setFontSize(16);
+      doc.text('Relatório Geral Detalhado de Avaliações', 14, currentY);
+      doc.setFontSize(10);
+      doc.text(`Gerado em: ${new Date().toLocaleDateString('pt-BR')}`, 14, currentY + 7);
+      
+      currentY += 15;
+
+      projects.forEach((project: Record<string, unknown>) => {
+        const students = project.students as Record<string, unknown>[] | undefined;
+        const notes = project.notes as Record<string, unknown>[] | undefined;
+
+        if (students && students.length > 0 && notes && notes.length > 0) {
+          // Verificar espaço na página
+          if (currentY > 250) {
+            doc.addPage();
+            currentY = 20;
+          }
+
+          // Título do projeto
+          doc.setFontSize(12);
+          doc.setFont('helvetica', 'bold');
+          doc.text(`Projeto: ${project.title as string}`, 14, currentY);
+          currentY += 7;
+
+          students.forEach((student: Record<string, unknown>) => {
+            const studentNotes = notes.filter((note: Record<string, unknown>) => 
+              note.studentId === student.id
+            );
+
+            if (studentNotes.length > 0) {
+              // Nome do aluno
+              doc.setFontSize(10);
+              doc.setFont('helvetica', 'bold');
+              doc.text(`Aluno: ${student.name as string}`, 14, currentY);
+              currentY += 5;
+
+              // Tabela de notas
+              const tableData = studentNotes.map((note: Record<string, unknown>, index) => {
+                const reqCommunication = note.reqCommunication as number;
+                const reqIdentify = note.reqIdentify as number;
+                const reqCreation = note.reqCreation as number;
+                const reqInteraction = note.reqInteraction as number;
+                const reqProject = note.reqProject as number;
+                const average = ((reqCommunication + reqIdentify + reqCreation + reqInteraction + reqProject) / 50).toFixed(2);
+
+                return [
+                  `Aval. ${index + 1}`,
+                  reqCommunication.toString(),
+                  reqIdentify.toString(),
+                  reqCreation.toString(),
+                  reqInteraction.toString(),
+                  reqProject.toString(),
+                  average
+                ];
+              });
+
+              // Calcular média final
+              const totalSum = studentNotes.reduce((sum, note: Record<string, unknown>) => {
+                return sum + 
+                  (note.reqCommunication as number) +
+                  (note.reqIdentify as number) +
+                  (note.reqCreation as number) +
+                  (note.reqInteraction as number) +
+                  (note.reqProject as number);
+              }, 0);
+              const finalAverage = (totalSum / (studentNotes.length * 50)).toFixed(2);
+
+              tableData.push([
+                'MÉDIA FINAL',
+                '',
+                '',
+                '',
+                '',
+                '',
+                finalAverage
+              ]);
+
+              autoTable(doc, {
+                startY: currentY,
+                head: [['Avaliação', 'Comunic.', 'Identif.', 'Criação', 'Interação', 'Projeto', 'Média']],
+                body: tableData,
+                theme: 'grid',
+                styles: { fontSize: 8 },
+                headStyles: { fillColor: [65, 30, 83], textColor: 255 },
+                margin: { left: 14, right: 14 },
+                didDrawPage: (data) => {
+                  currentY = data.cursor?.y || currentY;
+                }
+              });
+
+              currentY += 10;
+            }
+          });
+
+          currentY += 5;
+        }
+      });
+
+      doc.save(`relatorio_geral_detalhado_${new Date().toISOString().split('T')[0]}.pdf`);
+      toast.success('Relatório detalhado PDF gerado com sucesso!');
+    } catch (error) {
+      console.error(error);
+      toast.error('Erro ao gerar relatório PDF');
+    } finally {
+      setLoading(null);
+    }
+  }, []);
+
   const reports = [
     {
       id: 'projects' as ReportType,
@@ -215,6 +421,17 @@ export default function Reports() {
       color: '#FF6B6B',
       bg: '#FFE6E6',
       action: generateVotesReport
+    },
+    {
+      id: 'detailed' as ReportType,
+      title: 'Relatório Geral Detalhado',
+      description: 'Relatório completo com projeto, alunos, notas por jurado e critério, e média final',
+      icon: '📋',
+      color: '#E17055',
+      bg: '#FFE9E4',
+      action: generateDetailedReportCSV,
+      hasMultipleFormats: true,
+      pdfAction: generateDetailedReportPDF
     }
   ];
 
@@ -318,47 +535,134 @@ export default function Reports() {
               {report.description}
             </p>
 
-            <button
-              onClick={report.action}
-              disabled={loading !== null}
-              style={{
-                padding: '12px 20px',
-                backgroundColor: loading === report.id ? '#ccc' : report.color,
-                color: '#fff',
-                border: 'none',
-                borderRadius: '6px',
-                fontSize: '0.95em',
-                fontWeight: '600',
-                cursor: loading !== null ? 'not-allowed' : 'pointer',
-                transition: 'all 0.2s ease',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px'
-              }}
-              onMouseEnter={(e) => {
-                if (loading === null) {
-                  e.currentTarget.style.opacity = '0.9';
-                  e.currentTarget.style.transform = 'scale(1.02)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.opacity = '1';
-                e.currentTarget.style.transform = 'scale(1)';
-              }}
-            >
-              {loading === report.id ? (
-                <>
-                  <span>⏳</span>
-                  Gerando...
-                </>
-              ) : (
-                <>
-                  <span>📥</span>
-                  Baixar CSV
-                </>
-              )}
-            </button>
+            {report.hasMultipleFormats ? (
+              <div style={{ display: 'flex', gap: '8px', flexDirection: 'column' }}>
+                <button
+                  onClick={report.action}
+                  disabled={loading !== null}
+                  style={{
+                    padding: '12px 20px',
+                    backgroundColor: loading === report.id ? '#ccc' : report.color,
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '6px',
+                    fontSize: '0.95em',
+                    fontWeight: '600',
+                    cursor: loading !== null ? 'not-allowed' : 'pointer',
+                    transition: 'all 0.2s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (loading === null) {
+                      e.currentTarget.style.opacity = '0.9';
+                      e.currentTarget.style.transform = 'scale(1.02)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.opacity = '1';
+                    e.currentTarget.style.transform = 'scale(1)';
+                  }}
+                >
+                  {loading === report.id ? (
+                    <>
+                      <span>⏳</span>
+                      Gerando...
+                    </>
+                  ) : (
+                    <>
+                      <span>📥</span>
+                      Baixar CSV
+                    </>
+                  )}
+                </button>
+                <button
+                  onClick={report.pdfAction}
+                  disabled={loading !== null}
+                  style={{
+                    padding: '12px 20px',
+                    backgroundColor: loading === report.id ? '#ccc' : '#dc3545',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '6px',
+                    fontSize: '0.95em',
+                    fontWeight: '600',
+                    cursor: loading !== null ? 'not-allowed' : 'pointer',
+                    transition: 'all 0.2s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (loading === null) {
+                      e.currentTarget.style.opacity = '0.9';
+                      e.currentTarget.style.transform = 'scale(1.02)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.opacity = '1';
+                    e.currentTarget.style.transform = 'scale(1)';
+                  }}
+                >
+                  {loading === report.id ? (
+                    <>
+                      <span>⏳</span>
+                      Gerando...
+                    </>
+                  ) : (
+                    <>
+                      <span>📄</span>
+                      Baixar PDF
+                    </>
+                  )}
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={report.action}
+                disabled={loading !== null}
+                style={{
+                  padding: '12px 20px',
+                  backgroundColor: loading === report.id ? '#ccc' : report.color,
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '6px',
+                  fontSize: '0.95em',
+                  fontWeight: '600',
+                  cursor: loading !== null ? 'not-allowed' : 'pointer',
+                  transition: 'all 0.2s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px'
+                }}
+                onMouseEnter={(e) => {
+                  if (loading === null) {
+                    e.currentTarget.style.opacity = '0.9';
+                    e.currentTarget.style.transform = 'scale(1.02)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.opacity = '1';
+                  e.currentTarget.style.transform = 'scale(1)';
+                }}
+              >
+                {loading === report.id ? (
+                  <>
+                    <span>⏳</span>
+                    Gerando...
+                  </>
+                ) : (
+                  <>
+                    <span>📥</span>
+                    Baixar CSV
+                  </>
+                )}
+              </button>
+            )}
           </div>
         ))}
       </div>

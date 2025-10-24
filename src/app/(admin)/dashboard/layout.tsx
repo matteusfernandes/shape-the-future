@@ -21,6 +21,7 @@ export default async function DashboardLayoutRoot({
             <Link href="/dashboard/judget">Usuários</Link>
             <Link href="/dashboard">Espaços</Link>
             <Link href="/dashboard/projects">Projetos</Link>
+            <Link href="/dashboard/reports">Relatórios</Link>
           </>
         ) : (
           <>

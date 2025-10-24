@@ -33,6 +33,9 @@ export default function Judget() {
   const { isAdmin, isStaff } = useRole();
   const [judget, setJudget] = useState<Judget[]>([]);
   const [spaces, setSpaces] = useState<Space[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedRole, setSelectedRole] = useState<string>('all');
+  const [selectedSpace, setSelectedSpace] = useState<string>('all');
 
   const handleJudgeAndSpaces = useCallback(async () => {
     const [user, spaces] = await Promise.all([
@@ -57,6 +60,26 @@ export default function Judget() {
     handleJudgeAndSpaces();
   }, [handleJudgeAndSpaces]);
 
+  const filteredJudget = judget
+    .filter((judge) => (isStaff ? judge.role === 'judge' : true))
+    .filter((judge) => {
+      const matchesSearch = judge.username.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesRole = selectedRole === 'all' || judge.role === selectedRole;
+      const matchesSpace = selectedSpace === 'all' || judge.spaceId?.toString() === selectedSpace;
+
+      return matchesSearch && matchesRole && matchesSpace;
+    });
+
+  const getRoleBadge = (role: string) => {
+    const roles: Record<string, { label: string; color: string; bg: string }> = {
+      admin: { label: 'ADMIN', color: '#dc3545', bg: '#ffe6e9' },
+      staff: { label: 'STAFF', color: '#0066ff', bg: '#e6f2ff' },
+      judge: { label: 'JURADO', color: '#28a745', bg: '#e6f7ea' }
+    };
+    
+    return roles[role] || { label: role.toUpperCase(), color: '#666', bg: '#f0f0f0' };
+  };
+
   return (
     <WrapperContent>
       <HeaderContent>
@@ -67,25 +90,202 @@ export default function Judget() {
         </HeaderButton>
       </HeaderContent>
 
-      <ContentForm>
-        {judget
-          .filter((judge) => (isStaff ? judge.role === 'judge' : true))
-          ?.map((judge) => {
+      <div style={{ 
+        padding: '20px', 
+        backgroundColor: '#fff', 
+        borderRadius: '8px', 
+        marginBottom: '20px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '16px'
+      }}>
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', 
+          gap: '16px' 
+        }}>
+          <div>
+            <label style={{ 
+              display: 'block', 
+              marginBottom: '8px', 
+              color: '#141E53', 
+              fontWeight: '500',
+              fontSize: '0.9em'
+            }}>
+              Buscar usuário
+            </label>
+            <input
+              type="text"
+              placeholder="Digite o nome do usuário..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '10px 14px',
+                border: '1px solid #ddd',
+                borderRadius: '6px',
+                fontSize: '14px',
+                boxSizing: 'border-box'
+              }}
+            />
+          </div>
+
+          {isAdmin && (
+            <div>
+              <label style={{ 
+                display: 'block', 
+                marginBottom: '8px', 
+                color: '#141E53', 
+                fontWeight: '500',
+                fontSize: '0.9em'
+              }}>
+                Filtrar por função
+              </label>
+              <select
+                value={selectedRole}
+                onChange={(e) => setSelectedRole(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px 14px',
+                  border: '1px solid #ddd',
+                  borderRadius: '6px',
+                  fontSize: '14px',
+                  backgroundColor: '#fff',
+                  cursor: 'pointer',
+                  boxSizing: 'border-box'
+                }}
+              >
+                <option value="all">Todas as funções</option>
+                <option value="admin">Admin</option>
+                <option value="staff">Staff</option>
+                <option value="judge">Jurado</option>
+              </select>
+            </div>
+          )}
+
+          <div>
+            <label style={{ 
+              display: 'block', 
+              marginBottom: '8px', 
+              color: '#141E53', 
+              fontWeight: '500',
+              fontSize: '0.9em'
+            }}>
+              Filtrar por espaço
+            </label>
+            <select
+              value={selectedSpace}
+              onChange={(e) => setSelectedSpace(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '10px 14px',
+                border: '1px solid #ddd',
+                borderRadius: '6px',
+                fontSize: '14px',
+                backgroundColor: '#fff',
+                cursor: 'pointer',
+                boxSizing: 'border-box'
+              }}
+            >
+              <option value="all">Todos os espaços</option>
+              {spaces.map((space) => (
+                <option key={space.id} value={space.id.toString()}>
+                  {space.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'space-between',
+          paddingTop: '8px',
+          borderTop: '1px solid #eee',
+          fontSize: '0.9em',
+          color: '#666'
+        }}>
+          <span>
+            Mostrando <strong>{filteredJudget.length}</strong> de <strong>{judget.filter((j) => isStaff ? j.role === 'judge' : true).length}</strong> usuários
+          </span>
+          {(searchTerm || selectedRole !== 'all' || selectedSpace !== 'all') && (
+            <button
+              onClick={() => {
+                setSearchTerm('');
+                setSelectedRole('all');
+                setSelectedSpace('all');
+              }}
+              style={{
+                padding: '6px 12px',
+                backgroundColor: 'transparent',
+                color: '#141E53',
+                border: '1px solid #141E53',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontSize: '0.9em',
+                fontWeight: '500'
+              }}
+            >
+              Limpar filtros
+            </button>
+          )}
+        </div>
+      </div>
+
+      <ContentForm style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        {filteredJudget?.map((judge) => {
             const spaceProject = spaces.find((s) => s.id === judge.spaceId);
+            const roleBadge = getRoleBadge(judge.role);
 
             return (
-              <FormLine key={judge?.id?.toString()}>
-                <FormName>
-                  <span>
-                    {judge?.username}
-                    {judge?.role == 'judge'
-                      ? ` | JURADO (${spaceProject?.name})`
-                      : ` | ${judge?.role.toLocaleUpperCase()}`}
-                  </span>
+              <FormLine 
+                key={judge?.id?.toString()}
+                style={{
+                  padding: '30px 20px',
+                  backgroundColor: '#f8f9fa',
+                  marginBottom: 0,
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  boxSizing: 'border-box',
+                  width: '100%',
+                  borderLeft: `4px solid ${roleBadge.color}`
+                }}
+              >
+                <FormName style={{ flex: 1, minWidth: 0, paddingRight: '20px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                      <strong style={{ color: '#141E53', fontSize: '1.1em' }}>
+                        {judge?.username}
+                      </strong>
+                      <span style={{
+                        backgroundColor: roleBadge.bg,
+                        color: roleBadge.color,
+                        padding: '4px 12px',
+                        borderRadius: '12px',
+                        fontSize: '0.75em',
+                        fontWeight: 'bold',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '4px'
+                      }}>
+                        {roleBadge.label}
+                      </span>
+                    </div>
+                    {judge?.role === 'judge' && spaceProject && (
+                      <div style={{ color: '#666', fontSize: '0.9em', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        📍 <span>{spaceProject.name}</span>
+                      </div>
+                    )}
+                  </div>
                 </FormName>
 
-                <WrapperButtons>
-                  <Link href={`/dashboard/judget/${judge?.id}`}>
+                <WrapperButtons style={{ flexShrink: 0, display: 'flex', gap: '8px' }}>
+                  <Link 
+                    href={`/dashboard/judget/${judge?.id}`}
+                    title="Editar usuário"
+                  >
                     <svg
                       viewBox="0 0 24 24"
                       width="18"
@@ -102,7 +302,10 @@ export default function Judget() {
                   </Link>
 
                   {judge?.role == 'judge' && (
-                    <Link href={`/dashboard/judget/projects/${judge.id}`}>
+                    <Link 
+                      href={`/dashboard/judget/projects/${judge.id}`}
+                      title="Ver projetos avaliados"
+                    >
                       <svg
                         viewBox="0 0 24 24"
                         width="18"
@@ -120,7 +323,10 @@ export default function Judget() {
                   )}
 
                   {isAdmin && (
-                    <RemoveButton onClick={() => handleRemoveSpace(judge)}>
+                    <RemoveButton 
+                      onClick={() => handleRemoveSpace(judge)}
+                      title="Remover usuário"
+                    >
                       <svg
                         viewBox="0 0 24 24"
                         width="18"

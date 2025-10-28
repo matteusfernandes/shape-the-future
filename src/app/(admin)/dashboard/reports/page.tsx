@@ -298,51 +298,51 @@ export default function Reports() {
         return;
       }
 
-      const doc = new jsPDF();
-      let currentY = 20;
+      // Criar PDF em orientação horizontal
+      const doc = new jsPDF({
+        orientation: 'landscape'
+      });
+      
       let hasContent = false;
 
-      // Cabeçalho do documento
-      doc.setFontSize(16);
-      doc.setFont('helvetica', 'bold');
-      doc.text('Relatório Geral Detalhado de Avaliações', 14, currentY);
-      doc.setFontSize(10);
-      doc.setFont('helvetica', 'normal');
-      doc.text(`Gerado em: ${new Date().toLocaleDateString('pt-BR')}`, 14, currentY + 7);
-      
-      currentY += 15;
-
-      projects.forEach((project: Record<string, unknown>) => {
+      projects.forEach((project: Record<string, unknown>, projectIndex: number) => {
         const students = project.students as Record<string, unknown>[] | undefined;
         const notes = project.notes as Record<string, unknown>[] | undefined;
 
-        // Verificar espaço na página
-        if (currentY > 240) {
+        // Adicionar nova página para cada projeto (exceto o primeiro)
+        if (projectIndex > 0) {
           doc.addPage();
-          currentY = 20;
         }
 
-        // Título do projeto
-        doc.setFontSize(13);
+        let currentY = 20;
+
+        // Cabeçalho do projeto
+        doc.setFontSize(18);
         doc.setFont('helvetica', 'bold');
         doc.text(`Projeto: ${project.title as string}`, 14, currentY);
-        currentY += 6;
+        currentY += 10;
 
         // Lista de alunos
-        doc.setFontSize(9);
+        doc.setFontSize(11);
         doc.setFont('helvetica', 'normal');
         const studentNames = students?.map((s: Record<string, unknown>) => s.name as string).join(', ') || 'Sem alunos';
         const studentText = `Alunos: ${studentNames}`;
         
         // Quebrar texto se for muito longo
-        const splitStudents = doc.splitTextToSize(studentText, 180);
+        const splitStudents = doc.splitTextToSize(studentText, 260);
         doc.text(splitStudents, 14, currentY);
-        currentY += splitStudents.length * 4 + 3;
+        currentY += splitStudents.length * 5 + 5;
+
+        // Data de geração
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'italic');
+        doc.text(`Gerado em: ${new Date().toLocaleDateString('pt-BR')}`, 14, currentY);
+        currentY += 10;
 
         if (!notes || notes.length === 0) {
+          doc.setFontSize(11);
           doc.setFont('helvetica', 'italic');
           doc.text('Sem avaliações registradas', 14, currentY);
-          currentY += 10;
           return;
         }
 
@@ -394,34 +394,39 @@ export default function Reports() {
 
         autoTable(doc, {
           startY: currentY,
-          head: [['Avaliação', 'Comunic.', 'Identif.', 'Criação', 'Interação', 'Projeto', 'Total']],
+          head: [['Avaliação', 'Comunicação', 'Identificação', 'Criação', 'Interação', 'Projeto', 'Total']],
           body: tableData,
-          theme: 'grid',
+          theme: 'striped',
           styles: { 
-            fontSize: 8,
-            cellPadding: 2
+            fontSize: 10,
+            cellPadding: 4,
+            halign: 'center'
           },
           headStyles: { 
             fillColor: [65, 30, 83], 
             textColor: 255,
-            fontStyle: 'bold'
+            fontStyle: 'bold',
+            fontSize: 11
           },
           columnStyles: {
-            0: { fontStyle: 'bold', cellWidth: 25 },
-            1: { halign: 'center', cellWidth: 20 },
-            2: { halign: 'center', cellWidth: 20 },
-            3: { halign: 'center', cellWidth: 20 },
-            4: { halign: 'center', cellWidth: 20 },
-            5: { halign: 'center', cellWidth: 20 },
-            6: { halign: 'center', cellWidth: 20, fontStyle: 'bold' }
+            0: { fontStyle: 'bold', cellWidth: 40, halign: 'left' },
+            1: { cellWidth: 35 },
+            2: { cellWidth: 35 },
+            3: { cellWidth: 35 },
+            4: { cellWidth: 35 },
+            5: { cellWidth: 35 },
+            6: { fontStyle: 'bold', cellWidth: 35 }
           },
           margin: { left: 14, right: 14 },
-          didDrawPage: (data) => {
-            currentY = data.cursor?.y || currentY;
+          didParseCell: function(data) {
+            // Destacar linha de média final
+            if (data.row.index === tableData.length - 1) {
+              data.cell.styles.fillColor = [241, 196, 15];
+              data.cell.styles.fontStyle = 'bold';
+              data.cell.styles.fontSize = 11;
+            }
           }
         });
-
-        currentY += 8;
       });
 
       if (!hasContent) {

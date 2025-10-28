@@ -137,7 +137,8 @@ export default function Dashboard() {
       <ContentForm style={{ 
         display: 'grid', 
         gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', 
-        gap: '16px' 
+        gap: '16px',
+        padding: '10px'
       }}>
         {filteredSpaces?.map((space, index) => {
           const colors = getSpaceColor(index);

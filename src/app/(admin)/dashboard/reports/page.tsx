@@ -176,84 +176,111 @@ export default function Reports() {
     setLoading('detailed');
     try {
       const { data: projects } = await http.get('/projects');
+      
+      console.log('Projects data:', projects);
+      
       const detailedData: CSVData[] = [];
+
+      if (!projects || projects.length === 0) {
+        toast.warning('Nenhum projeto encontrado');
+        setLoading(null);
+        return;
+      }
 
       projects.forEach((project: Record<string, unknown>) => {
         const students = project.students as Record<string, unknown>[] | undefined;
         const notes = project.notes as Record<string, unknown>[] | undefined;
 
-        if (students && students.length > 0) {
-          students.forEach((student: Record<string, unknown>) => {
-            // Calcular média do aluno
-            const studentNotes = notes?.filter((note: Record<string, unknown>) => 
-              note.studentId === student.id
-            ) || [];
+        console.log(`Projeto: ${project.title}`, {
+          hasStudents: !!students,
+          studentsCount: students?.length || 0,
+          hasNotes: !!notes,
+          notesCount: notes?.length || 0
+        });
 
-            if (studentNotes.length > 0) {
-              studentNotes.forEach((note: Record<string, unknown>, index) => {
-                const reqCommunication = note.reqCommunication as number;
-                const reqIdentify = note.reqIdentify as number;
-                const reqCreation = note.reqCreation as number;
-                const reqInteraction = note.reqInteraction as number;
-                const reqProject = note.reqProject as number;
+        // Listar alunos do projeto
+        const studentNames = students?.map((s: Record<string, unknown>) => s.name as string).join(', ') || 'Sem alunos';
 
-                const average = (
-                  (reqCommunication + reqIdentify + reqCreation + reqInteraction + reqProject) / 50
-                ).toFixed(2);
-
-                detailedData.push({
-                  'ID do Projeto': project.id as number,
-                  'Nome do Projeto': project.title as string,
-                  'ID do Aluno': student.id as number,
-                  'Nome do Aluno': student.name as string,
-                  'Avaliação Nº': index + 1,
-                  'Comunicação (0-10)': reqCommunication,
-                  'Identificação (0-10)': reqIdentify,
-                  'Criação (0-10)': reqCreation,
-                  'Interação (0-10)': reqInteraction,
-                  'Projeto (0-10)': reqProject,
-                  'Média da Avaliação': average
-                });
-              });
-
-              // Calcular média final do aluno
-              const totalSum = studentNotes.reduce((sum, note: Record<string, unknown>) => {
-                return sum + 
-                  (note.reqCommunication as number) +
-                  (note.reqIdentify as number) +
-                  (note.reqCreation as number) +
-                  (note.reqInteraction as number) +
-                  (note.reqProject as number);
-              }, 0);
-
-              const finalAverage = (totalSum / (studentNotes.length * 50)).toFixed(2);
-
-              detailedData.push({
-                'ID do Projeto': project.id as number,
-                'Nome do Projeto': project.title as string,
-                'ID do Aluno': student.id as number,
-                'Nome do Aluno': student.name as string,
-                'Avaliação Nº': 'MÉDIA FINAL',
-                'Comunicação (0-10)': '',
-                'Identificação (0-10)': '',
-                'Criação (0-10)': '',
-                'Interação (0-10)': '',
-                'Projeto (0-10)': '',
-                'Média da Avaliação': finalAverage
-              });
-            }
+        // Se não tem notas, adicionar linha indicando
+        if (!notes || notes.length === 0) {
+          detailedData.push({
+            'ID do Projeto': project.id as number,
+            'Nome do Projeto': project.title as string,
+            'Alunos': studentNames,
+            'Avaliação Nº': 'N/A',
+            'Comunicação (0-2)': 'Sem avaliações',
+            'Identificação (0-2)': 'Sem avaliações',
+            'Criação (0-2)': 'Sem avaliações',
+            'Interação (0-2)': 'Sem avaliações',
+            'Projeto (0-2)': 'Sem avaliações',
+            'Total (0-10)': 'N/A'
           });
+          return;
         }
+
+        // Adicionar cada avaliação (nota de cada jurado)
+        notes.forEach((note: Record<string, unknown>, index) => {
+          const reqCommunication = ((note.reqCommunication as number) || 0) / 10;
+          const reqIdentify = ((note.reqIdentify as number) || 0) / 10;
+          const reqCreation = ((note.reqCreation as number) || 0) / 10;
+          const reqInteraction = ((note.reqInteraction as number) || 0) / 10;
+          const reqProject = ((note.reqProject as number) || 0) / 10;
+
+          const total = reqCommunication + reqIdentify + reqCreation + reqInteraction + reqProject;
+
+          detailedData.push({
+            'ID do Projeto': project.id as number,
+            'Nome do Projeto': project.title as string,
+            'Alunos': studentNames,
+            'Avaliação Nº': index + 1,
+            'Comunicação (0-2)': reqCommunication,
+            'Identificação (0-2)': reqIdentify,
+            'Criação (0-2)': reqCreation,
+            'Interação (0-2)': reqInteraction,
+            'Projeto (0-2)': reqProject,
+            'Total (0-10)': total
+          });
+        });
+
+        // Calcular média final do projeto
+        const totalSum = notes.reduce((sum, note: Record<string, unknown>) => {
+          return sum + 
+            ((note.reqCommunication as number) || 0) +
+            ((note.reqIdentify as number) || 0) +
+            ((note.reqCreation as number) || 0) +
+            ((note.reqInteraction as number) || 0) +
+            ((note.reqProject as number) || 0);
+        }, 0);
+
+        // Dividir por 10 para converter de escala 0-50 para 0-5, e depois dividir pelo número de notas
+        const finalAverage = ((totalSum / 10) / notes.length).toFixed(2);
+
+        detailedData.push({
+          'ID do Projeto': project.id as number,
+          'Nome do Projeto': project.title as string,
+          'Alunos': studentNames,
+          'Avaliação Nº': 'MÉDIA FINAL',
+          'Comunicação (0-2)': '',
+          'Identificação (0-2)': '',
+          'Criação (0-2)': '',
+          'Interação (0-2)': '',
+          'Projeto (0-2)': '',
+          'Total (0-10)': finalAverage
+        });
       });
 
+      console.log('Detailed data:', detailedData);
+
       if (detailedData.length === 0) {
-        toast.warning('Nenhum dado de avaliação encontrado');
+        toast.warning('Nenhum dado disponível para exportar');
+        setLoading(null);
         return;
       }
 
       downloadCSV(detailedData, 'relatorio_geral_detalhado');
       toast.success('Relatório detalhado CSV gerado com sucesso!');
     } catch (error) {
+      console.error('Erro ao gerar relatório:', error);
       toast.error('Erro ao gerar relatório detalhado');
     } finally {
       setLoading(null);
@@ -265,12 +292,22 @@ export default function Reports() {
     try {
       const { data: projects } = await http.get('/projects');
       
+      if (!projects || projects.length === 0) {
+        toast.warning('Nenhum projeto encontrado');
+        setLoading(null);
+        return;
+      }
+
       const doc = new jsPDF();
       let currentY = 20;
+      let hasContent = false;
 
+      // Cabeçalho do documento
       doc.setFontSize(16);
+      doc.setFont('helvetica', 'bold');
       doc.text('Relatório Geral Detalhado de Avaliações', 14, currentY);
       doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
       doc.text(`Gerado em: ${new Date().toLocaleDateString('pt-BR')}`, 14, currentY + 7);
       
       currentY += 15;
@@ -279,97 +316,124 @@ export default function Reports() {
         const students = project.students as Record<string, unknown>[] | undefined;
         const notes = project.notes as Record<string, unknown>[] | undefined;
 
-        if (students && students.length > 0 && notes && notes.length > 0) {
-          // Verificar espaço na página
-          if (currentY > 250) {
-            doc.addPage();
-            currentY = 20;
-          }
-
-          // Título do projeto
-          doc.setFontSize(12);
-          doc.setFont('helvetica', 'bold');
-          doc.text(`Projeto: ${project.title as string}`, 14, currentY);
-          currentY += 7;
-
-          students.forEach((student: Record<string, unknown>) => {
-            const studentNotes = notes.filter((note: Record<string, unknown>) => 
-              note.studentId === student.id
-            );
-
-            if (studentNotes.length > 0) {
-              // Nome do aluno
-              doc.setFontSize(10);
-              doc.setFont('helvetica', 'bold');
-              doc.text(`Aluno: ${student.name as string}`, 14, currentY);
-              currentY += 5;
-
-              // Tabela de notas
-              const tableData = studentNotes.map((note: Record<string, unknown>, index) => {
-                const reqCommunication = note.reqCommunication as number;
-                const reqIdentify = note.reqIdentify as number;
-                const reqCreation = note.reqCreation as number;
-                const reqInteraction = note.reqInteraction as number;
-                const reqProject = note.reqProject as number;
-                const average = ((reqCommunication + reqIdentify + reqCreation + reqInteraction + reqProject) / 50).toFixed(2);
-
-                return [
-                  `Aval. ${index + 1}`,
-                  reqCommunication.toString(),
-                  reqIdentify.toString(),
-                  reqCreation.toString(),
-                  reqInteraction.toString(),
-                  reqProject.toString(),
-                  average
-                ];
-              });
-
-              // Calcular média final
-              const totalSum = studentNotes.reduce((sum, note: Record<string, unknown>) => {
-                return sum + 
-                  (note.reqCommunication as number) +
-                  (note.reqIdentify as number) +
-                  (note.reqCreation as number) +
-                  (note.reqInteraction as number) +
-                  (note.reqProject as number);
-              }, 0);
-              const finalAverage = (totalSum / (studentNotes.length * 50)).toFixed(2);
-
-              tableData.push([
-                'MÉDIA FINAL',
-                '',
-                '',
-                '',
-                '',
-                '',
-                finalAverage
-              ]);
-
-              autoTable(doc, {
-                startY: currentY,
-                head: [['Avaliação', 'Comunic.', 'Identif.', 'Criação', 'Interação', 'Projeto', 'Média']],
-                body: tableData,
-                theme: 'grid',
-                styles: { fontSize: 8 },
-                headStyles: { fillColor: [65, 30, 83], textColor: 255 },
-                margin: { left: 14, right: 14 },
-                didDrawPage: (data) => {
-                  currentY = data.cursor?.y || currentY;
-                }
-              });
-
-              currentY += 10;
-            }
-          });
-
-          currentY += 5;
+        // Verificar espaço na página
+        if (currentY > 240) {
+          doc.addPage();
+          currentY = 20;
         }
+
+        // Título do projeto
+        doc.setFontSize(13);
+        doc.setFont('helvetica', 'bold');
+        doc.text(`Projeto: ${project.title as string}`, 14, currentY);
+        currentY += 6;
+
+        // Lista de alunos
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'normal');
+        const studentNames = students?.map((s: Record<string, unknown>) => s.name as string).join(', ') || 'Sem alunos';
+        const studentText = `Alunos: ${studentNames}`;
+        
+        // Quebrar texto se for muito longo
+        const splitStudents = doc.splitTextToSize(studentText, 180);
+        doc.text(splitStudents, 14, currentY);
+        currentY += splitStudents.length * 4 + 3;
+
+        if (!notes || notes.length === 0) {
+          doc.setFont('helvetica', 'italic');
+          doc.text('Sem avaliações registradas', 14, currentY);
+          currentY += 10;
+          return;
+        }
+
+        hasContent = true;
+
+        // Tabela de notas
+        const tableData = notes.map((note: Record<string, unknown>, index) => {
+          const reqCommunication = ((note.reqCommunication as number) || 0) / 10;
+          const reqIdentify = ((note.reqIdentify as number) || 0) / 10;
+          const reqCreation = ((note.reqCreation as number) || 0) / 10;
+          const reqInteraction = ((note.reqInteraction as number) || 0) / 10;
+          const reqProject = ((note.reqProject as number) || 0) / 10;
+          
+          const total = reqCommunication + reqIdentify + reqCreation + reqInteraction + reqProject;
+
+          return [
+            `Jurado ${index + 1}`,
+            reqCommunication.toString(),
+            reqIdentify.toString(),
+            reqCreation.toString(),
+            reqInteraction.toString(),
+            reqProject.toString(),
+            total.toFixed(1)
+          ];
+        });
+
+        // Calcular média final do projeto
+        const totalSum = notes.reduce((sum, note: Record<string, unknown>) => {
+          return sum + 
+            ((note.reqCommunication as number) || 0) +
+            ((note.reqIdentify as number) || 0) +
+            ((note.reqCreation as number) || 0) +
+            ((note.reqInteraction as number) || 0) +
+            ((note.reqProject as number) || 0);
+        }, 0);
+        
+        // Dividir por 10 para converter de escala 0-50 para 0-5, e depois dividir pelo número de notas
+        const finalAverage = ((totalSum / 10) / notes.length).toFixed(2);
+
+        tableData.push([
+          'MÉDIA FINAL',
+          '',
+          '',
+          '',
+          '',
+          '',
+          finalAverage
+        ]);
+
+        autoTable(doc, {
+          startY: currentY,
+          head: [['Avaliação', 'Comunic.', 'Identif.', 'Criação', 'Interação', 'Projeto', 'Total']],
+          body: tableData,
+          theme: 'grid',
+          styles: { 
+            fontSize: 8,
+            cellPadding: 2
+          },
+          headStyles: { 
+            fillColor: [65, 30, 83], 
+            textColor: 255,
+            fontStyle: 'bold'
+          },
+          columnStyles: {
+            0: { fontStyle: 'bold', cellWidth: 25 },
+            1: { halign: 'center', cellWidth: 20 },
+            2: { halign: 'center', cellWidth: 20 },
+            3: { halign: 'center', cellWidth: 20 },
+            4: { halign: 'center', cellWidth: 20 },
+            5: { halign: 'center', cellWidth: 20 },
+            6: { halign: 'center', cellWidth: 20, fontStyle: 'bold' }
+          },
+          margin: { left: 14, right: 14 },
+          didDrawPage: (data) => {
+            currentY = data.cursor?.y || currentY;
+          }
+        });
+
+        currentY += 8;
       });
+
+      if (!hasContent) {
+        toast.warning('Nenhuma avaliação encontrada para gerar o PDF');
+        setLoading(null);
+        return;
+      }
 
       doc.save(`relatorio_geral_detalhado_${new Date().toISOString().split('T')[0]}.pdf`);
       toast.success('Relatório detalhado PDF gerado com sucesso!');
     } catch (error) {
-      console.error(error);
+      console.error('Erro ao gerar PDF:', error);
       toast.error('Erro ao gerar relatório PDF');
     } finally {
       setLoading(null);

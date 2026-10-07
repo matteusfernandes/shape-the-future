@@ -17,6 +17,7 @@ import {
 } from '../style';
 import Link from 'next/link';
 import { useRole } from '@/hooks/useRole';
+import { isSigmaRole } from '@/constants';
 
 type Space = { id: number; name: string };
 
@@ -30,7 +31,7 @@ export type Judget = {
 };
 
 export default function Judget() {
-  const { isAdmin, isStaff } = useRole();
+  const { isAdmin, isSigma, isStaff } = useRole();
   const [judget, setJudget] = useState<Judget[]>([]);
   const [spaces, setSpaces] = useState<Space[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -62,6 +63,7 @@ export default function Judget() {
 
   const filteredJudget = judget
     .filter((judge) => (isStaff ? judge.role === 'judge' : true))
+    .filter((judge) => isSigma || !isSigmaRole(judge.role))
     .filter((judge) => {
       const matchesSearch = judge.username.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesRole = selectedRole === 'all' || judge.role === selectedRole;
@@ -72,6 +74,7 @@ export default function Judget() {
 
   const getRoleBadge = (role: string) => {
     const roles: Record<string, { label: string; color: string; bg: string }> = {
+      sigma: { label: 'SIGMA', color: '#6f42c1', bg: '#f0e9fb' },
       admin: { label: 'ADMIN', color: '#dc3545', bg: '#ffe6e9' },
       staff: { label: 'STAFF', color: '#0066ff', bg: '#e6f2ff' },
       judge: { label: 'JURADO', color: '#28a745', bg: '#e6f7ea' }
@@ -156,6 +159,7 @@ export default function Judget() {
                 }}
               >
                 <option value="all">Todas as funções</option>
+                {isSigma && <option value="sigma">Sigma</option>}
                 <option value="admin">Admin</option>
                 <option value="staff">Staff</option>
                 <option value="judge">Jurado</option>

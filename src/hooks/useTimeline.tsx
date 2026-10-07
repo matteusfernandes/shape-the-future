@@ -9,6 +9,7 @@ import { Timeline } from '../app/timeline/timelines';
 export function useTimeline() {
   const [spaces, setSpaces] = useState<Timeline[]>([]);
   const [block, setBlock] = useState(1);
+  const [error, setError] = useState(false);
 
   const spacesFiltered = useMemo(() => {
     return spaces?.map((space) => ({
@@ -24,8 +25,14 @@ export function useTimeline() {
   }, [block, spaces]);
 
   const handleSpaces = useCallback(async () => {
-    const { data } = await http.get<Timeline[]>('/spaces/projects');
-    setSpaces(data);
+    setError(false);
+
+    try {
+      const { data } = await http.get<Timeline[]>('/spaces/projects');
+      setSpaces(data);
+    } catch {
+      setError(true);
+    }
   }, []);
 
   useEffect(() => {
@@ -33,7 +40,10 @@ export function useTimeline() {
   }, [handleSpaces]);
 
   return {
+    spaces,
     spacesFiltered,
+    error,
+    reload: handleSpaces,
     block,
     setBlock
   };

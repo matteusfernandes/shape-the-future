@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { ContainerDashboard, ContentDashboard, MenuDashboard } from './style';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { isAdminRole, isSigmaRole } from '@/constants';
 
 type DashboardLayoutRootProps = {
   children: React.ReactNode;
@@ -16,12 +17,15 @@ export default async function DashboardLayoutRoot({
     <ContainerDashboard>
       <MenuDashboard>
         <h3>cadastro</h3>
-        {session?.user?.role?.toLowerCase() === 'admin' ? (
+        {isAdminRole(session?.user?.role) ? (
           <>
             <Link href="/dashboard/judget">Usuários</Link>
             <Link href="/dashboard">Espaços</Link>
             <Link href="/dashboard/projects">Projetos</Link>
             <Link href="/dashboard/reports">Relatórios</Link>
+            {isSigmaRole(session?.user?.role) ? (
+              <Link href="/dashboard/sigma">Sigma</Link>
+            ) : null}
           </>
         ) : (
           <>

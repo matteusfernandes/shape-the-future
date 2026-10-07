@@ -30,7 +30,7 @@ type Project = {
 type Space = { id: number; name: string };
 
 export default function Projects() {
-  const { isAdmin } = useRole();
+  const { isAdmin, isSigma } = useRole();
   const [projects, setProjects] = useState<Project[]>([]);
   const [spaces, setSpaces] = useState<Space[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -86,9 +86,16 @@ export default function Projects() {
       <HeaderContent>
         <h3>Todos os Projetos</h3>
 
-        <HeaderButton href="/dashboard/projects/create">
-          Adicionar Projeto
-        </HeaderButton>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          {isSigma && (
+            <HeaderButton href="/dashboard/projects/import">
+              Importar Planilha
+            </HeaderButton>
+          )}
+          <HeaderButton href="/dashboard/projects/create">
+            Adicionar Projeto
+          </HeaderButton>
+        </div>
       </HeaderContent>
 
       <div style={{ 

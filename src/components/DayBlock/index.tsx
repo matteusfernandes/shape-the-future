@@ -1,25 +1,34 @@
 'use client';
 
-import { Container, DayButton } from './style';
+import { SESSIONS, sessionRange } from '@/constants';
 
-export function DayBlock({ block, setBlock }) {
+import { Container, DayButton, Range } from './style';
+
+type DayBlockProps = {
+  block: number;
+  setBlock: (block: number) => void;
+  // Usa a cor de cada sessão (cronograma); sem ela mantém o visual neutro
+  colored?: boolean;
+  counts?: Record<number, number>;
+};
+
+export function DayBlock({ block, setBlock, colored, counts }: DayBlockProps) {
   return (
-    <Container>
-      <DayButton
-        type="button"
-        active={block == 1 ? true : false}
-        onClick={() => setBlock(1)}
-      >
-        Sessão 1
-      </DayButton>
-
-      <DayButton
-        type="button"
-        active={block == 2 ? true : false}
-        onClick={() => setBlock(2)}
-      >
-        Sessão 2
-      </DayButton>
+    <Container $colored={colored}>
+      {SESSIONS.map((session) => (
+        <DayButton
+          key={session.id}
+          type="button"
+          aria-pressed={block === session.id}
+          $active={block === session.id}
+          $color={colored ? session.color : undefined}
+          onClick={() => setBlock(session.id)}
+        >
+          {session.label}
+          {counts ? ` (${counts[session.id] ?? 0})` : ''}
+          <Range>{sessionRange(session.schedules)}</Range>
+        </DayButton>
+      ))}
     </Container>
   );
 }

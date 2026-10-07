@@ -10,7 +10,8 @@ export const Container = styled.div`
 export const MobileDropdown = styled.div`
   display: none;
   position: relative;
-  z-index: 100;
+  /* Só precisa abrir por cima dos cards; o menu da navbar fica acima */
+  z-index: 2;
 
   @media (max-width: 768px) {
     display: block;
@@ -223,20 +224,9 @@ export const HeaderContent = styled.div`
     flex-shrink: 0;
   }
 
-  /* Estilização do DayBlock quando dentro do HeaderContent */
+  /* Seletor de sessão */
   > div {
     flex-shrink: 0;
-    width: auto;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
-
-    /* Redimensiona os botões do DayBlock */
-    button {
-      padding: 12px 20px;
-      font-size: 14px;
-      font-weight: 600;
-    }
   }
 
   @media (max-width: 768px) {
@@ -283,18 +273,57 @@ export const ProjectList = styled.div`
   }
 `;
 
-export const ProjectCard = styled.div`
+export const SessionBanner = styled.div<{ $color: string; $soft: string }>`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+  padding: 14px 18px;
+  background-color: ${({ $soft }) => $soft};
+  border-left: 6px solid ${({ $color }) => $color};
+  border-radius: 8px;
+  color: #141e53;
+  font-size: 15px;
+  flex-shrink: 0;
+
+  strong {
+    font-size: 17px;
+  }
+`;
+
+export const ProjectCard = styled.div<{ $color: string }>`
   background: #fff;
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
   transition: all 0.3s ease;
-  border-left: 4px solid #717cba;
+  border-left: 6px solid ${({ $color }) => $color};
 
   &:hover {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
     transform: translateY(-2px);
   }
+`;
+
+export const ProjectMeta = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+`;
+
+export const Chip = styled.span<{ $color: string; $bg: string }>`
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  color: ${({ $color }) => $color};
+  background-color: ${({ $bg }) => $bg};
 `;
 
 export const ProjectTitle = styled.h3`
@@ -330,4 +359,28 @@ export const LoadingContent = styled.div`
   min-height: 600px;
   font-size: 18px;
   color: #666;
+`;
+
+export const ErrorBox = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  color: #fff;
+  text-align: center;
+
+  button {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 6px;
+    background-color: #fff;
+    color: #141e53;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+
+    &:hover {
+      opacity: 0.85;
+    }
+  }
 `;

@@ -1,6 +1,19 @@
 export const BLOCK1 = ['9:00', '9:15', '9:30', '9:45', '10:00'];
 export const BLOCK2 = ['10:15', '10:30', '10:45', '11:00', '11:15'];
 
+// Sessões de apresentação: cada uma tem uma cor fixa da paleta do projeto,
+// usada no seletor, no aviso e nos cards do cronograma
+export const SESSIONS = [
+  { id: 1, label: 'Sessão 1', schedules: BLOCK1, color: '#55B47A', soft: '#E8F5EC' },
+  { id: 2, label: 'Sessão 2', schedules: BLOCK2, color: '#EC72A1', soft: '#FDEAF2' }
+];
+
+export const getSession = (id: number) =>
+  SESSIONS.find((session) => session.id === id) ?? SESSIONS[0];
+
+export const sessionRange = (schedules: string[]) =>
+  `${schedules[0]} às ${schedules[schedules.length - 1]}`;
+
 export const ROLES = {
   admin: 'ADMIN',
   staff: 'STAFF',

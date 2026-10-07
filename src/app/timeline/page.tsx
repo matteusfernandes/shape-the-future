@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useTimeline } from '@/hooks/useTimeline';
 
 import { DayBlock } from '@/components/DayBlock';
+import { SESSIONS, getSession, sessionRange } from '@/constants';
 
 import { 
   Container, 
@@ -18,19 +19,38 @@ import {
   SpaceItem, 
   ProjectList,
   ProjectCard,
+  ProjectMeta,
+  Chip,
+  SessionBanner,
   ProjectTitle,
   ProjectParticipants,
   EmptyState,
-  LoadingContent 
+  LoadingContent,
+  ErrorBox
 } from './style';
 import _ from 'lodash';
 
 export default function Timeline() {
-  const { spacesFiltered, block, setBlock } = useTimeline();
-  const [selectedSpaceId, setSelectedSpaceId] = useState<number | null>(
-    spacesFiltered.length > 0 ? spacesFiltered[0].id : null
-  );
+  const { spaces, spacesFiltered, block, setBlock, error, reload } =
+    useTimeline();
+  const [spaceId, setSelectedSpaceId] = useState<number | null>(null);
+  // Sem escolha do usuário, abre no primeiro espaço
+  const selectedSpaceId = spaceId ?? spacesFiltered[0]?.id ?? null;
+  const session = getSession(block);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  if (error) {
+    return (
+      <LoadingContent>
+        <ErrorBox>
+          <p>Não foi possível carregar o cronograma.</p>
+          <button type="button" onClick={reload}>
+            Tentar novamente
+          </button>
+        </ErrorBox>
+      </LoadingContent>
+    );
+  }
 
   if (_.isEmpty(spacesFiltered)) {
     return <LoadingContent>Carregando...</LoadingContent>;
@@ -38,8 +58,19 @@ export default function Timeline() {
 
   const selectedSpace = spacesFiltered.find(space => space.id === selectedSpaceId);
 
-  const handleSpaceSelect = (spaceId: number) => {
-    setSelectedSpaceId(spaceId);
+  // Quantidade de projetos do espaço em cada sessão
+  const sessionCounts = Object.fromEntries(
+    SESSIONS.map((item) => [
+      item.id,
+      spaces
+        .find((space) => space.id === selectedSpaceId)
+        ?.projects?.filter((project) => item.schedules.includes(project.schedule))
+        .length ?? 0
+    ])
+  );
+
+  const handleSpaceSelect = (id: number) => {
+    setSelectedSpaceId(id);
     setIsDropdownOpen(false);
   };
 
@@ -85,8 +116,29 @@ export default function Timeline() {
             <>
               <HeaderContent>
                 <h1>{selectedSpace.name}</h1>
-                <DayBlock block={block} setBlock={setBlock} />
+                <DayBlock
+                  block={block}
+                  setBlock={setBlock}
+                  counts={sessionCounts}
+                  colored
+                />
               </HeaderContent>
+
+              <SessionBanner $color={session.color} $soft={session.soft}>
+                <strong>Você está vendo a {session.label}</strong>
+                <span>
+                  das {sessionRange(session.schedules)} ·{' '}
+                  {sessionCounts[session.id]} projeto
+                  {sessionCounts[session.id] === 1 ? '' : 's'} neste espaço
+                </span>
+              </SessionBanner>
+
+              {!selectedSpace.projects?.length ? (
+                <EmptyState>
+                  Nenhum projeto deste espaço na {session.label}.
+                </EmptyState>
+              ) : null}
+
               <ProjectList>
                 {selectedSpace.projects
                   ?.sort(
@@ -105,7 +157,15 @@ export default function Timeline() {
                       .join(' | ');
 
                     return (
-                      <ProjectCard key={project.id}>
+                      <ProjectCard key={project.id} $color={session.color}>
+                        <ProjectMeta>
+                          <Chip $color="#141E53" $bg={session.color}>
+                            {project.schedule}
+                          </Chip>
+                          <Chip $color="#141E53" $bg={session.soft}>
+                            {session.label}
+                          </Chip>
+                        </ProjectMeta>
                         <ProjectTitle>{project.title}</ProjectTitle>
                         {participants && (
                           <ProjectParticipants>{participants}</ProjectParticipants>

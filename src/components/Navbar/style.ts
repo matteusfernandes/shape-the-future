@@ -110,7 +110,8 @@ export const Menu = styled.div<MenuProps>`
   right: -80%;
   top: 0;
   bottom: 0;
-  z-index: 10;
+  /* Menu mobile sobrepõe toda a página */
+  z-index: 1000;
   transition: all 0.2s ease-in-out;
   padding: 20px;
 

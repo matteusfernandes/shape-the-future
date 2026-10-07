@@ -37,7 +37,7 @@ const schema = yup.object({
 
 export function Form({ data }: { data: JudgetProps[] }) {
   const { back } = useRouter();
-  const { isAdmin, isStaff } = useRole();
+  const { isAdmin, isSigma, isStaff } = useRole();
 
   const {
     watch,
@@ -110,7 +110,9 @@ export function Form({ data }: { data: JudgetProps[] }) {
               {...register('role')}
             >
               <option>Selecionar role</option>
-              {Object.keys(ROLES)?.map((role) => (
+              {Object.keys(ROLES)
+                ?.filter((role) => isSigma || role !== 'sigma')
+                .map((role) => (
                 <option key={role} value={role}>
                   {role}
                 </option>

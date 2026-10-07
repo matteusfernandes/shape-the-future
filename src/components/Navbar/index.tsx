@@ -20,14 +20,13 @@ import {
 } from './style';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
+import { isAdminRole, isDashboardRole, isSigmaRole } from '@/constants';
 
 export function Navbar() {
   const { data: session } = useSession();
   const pathname = usePathname();
   const [showMenu, setShowMenu] = useState(false);
-  const isAdminOrStaff = ['admin', 'staff'].includes(
-    session?.user?.role as string
-  );
+  const isAdminOrStaff = isDashboardRole(session?.user?.role);
 
   const isActive = useCallback(
     (path: string, otherClass: string = '') => {
@@ -121,7 +120,7 @@ export function Navbar() {
               </MyLink>
 
               <MenuDashboard>
-                {session?.user?.role?.toLowerCase() === 'admin' ? (
+                {isAdminRole(session?.user?.role) ? (
                   <>
                     <Link
                       href="/dashboard/judget"
@@ -138,6 +137,14 @@ export function Navbar() {
                     >
                       Projetos
                     </Link>
+                    {isSigmaRole(session?.user?.role) ? (
+                      <Link
+                        href="/dashboard/sigma"
+                        onClick={() => setShowMenu(false)}
+                      >
+                        Sigma
+                      </Link>
+                    ) : null}
                   </>
                 ) : (
                   <>

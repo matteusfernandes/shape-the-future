@@ -47,7 +47,7 @@ type UpdateJudgetProps = {
 };
 
 export default function UpdateJudget({ params: { id } }: UpdateJudgetProps) {
-  const { isAdmin, isStaff } = useRole();
+  const { isAdmin, isSigma, isStaff } = useRole();
   const { back } = useRouter();
   const [judget, setJudget] = useState<Judget>();
   const [spaces, setSpaces] = useState<Space[]>();
@@ -154,7 +154,9 @@ export default function UpdateJudget({ params: { id } }: UpdateJudgetProps) {
               {...register('role')}
             >
               <option>Selecionar role</option>
-              {Object.keys(ROLES)?.map((role) => (
+              {Object.keys(ROLES)
+                ?.filter((role) => isSigma || role !== 'sigma')
+                .map((role) => (
                 <option key={role} value={role}>
                   {role}
                 </option>

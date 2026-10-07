@@ -1,6 +1,6 @@
 'use client';
 
-import { ROLES } from '@/constants';
+import { ROLES, isAdminRole, isSigmaRole } from '@/constants';
 import _ from 'lodash';
 import { useSession } from 'next-auth/react';
 import { useMemo } from 'react';
@@ -9,10 +9,11 @@ export function useRole() {
   const { data: session } = useSession();
 
   const isAdmin = useMemo(() => {
-    return _.isEqual(
-      session?.user?.role.toLowerCase(),
-      ROLES.admin.toLowerCase()
-    );
+    return isAdminRole(session?.user?.role);
+  }, [session?.user?.role]);
+
+  const isSigma = useMemo(() => {
+    return isSigmaRole(session?.user?.role);
   }, [session?.user?.role]);
 
   const isStaff = useMemo(() => {
@@ -31,6 +32,7 @@ export function useRole() {
 
   return {
     isAdmin,
+    isSigma,
     isStaff,
     isJudge
   };

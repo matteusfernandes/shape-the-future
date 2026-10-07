@@ -11,29 +11,31 @@ import {
   ProjectDraft,
   SCHEDULES,
   Space,
-  clearDrafts,
-  loadDrafts,
-  saveDrafts,
+  projectDrafts,
   toImportPayload,
   validateDrafts
 } from '@/lib/projectImport';
-
-import { HeaderButton, HeaderContent, WrapperContent } from '../../../style';
+import { RemoveIcon } from '@/components/Icons';
 import {
-  ActionButton,
-  Actions,
-  Card,
+  EmptyReview,
+  ReviewCard,
+  ReviewSummary
+} from '@/components/ImportReview';
+
+import {
   CardGrid,
-  CardHeader,
-  Field,
+  COLORS,
+  FieldLabel,
+  HeaderButton,
+  HeaderContent,
   IconButton,
-  LinkButton,
-  Messages,
-  Panel,
-  Row,
-  StudentLine,
-  Summary
-} from '../style';
+  OutlineButton,
+  PageStack,
+  SelectInput,
+  TextInput,
+  TipBox,
+  WrapperContent
+} from '../../../style';
 
 const NEW_SPACE = 'new';
 
@@ -46,7 +48,7 @@ export default function ProjectImportReview() {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    setDrafts(loadDrafts() ?? []);
+    setDrafts(projectDrafts.load() ?? []);
 
     Promise.all([
       http.get<Space[]>('/spaces'),
@@ -61,7 +63,7 @@ export default function ProjectImportReview() {
 
   const updateDrafts = useCallback((next: ProjectDraft[]) => {
     setDrafts(next);
-    saveDrafts(next);
+    projectDrafts.save(next);
   }, []);
 
   const updateDraft = useCallback(
@@ -92,7 +94,6 @@ export default function ProjectImportReview() {
     );
 
     return {
-      projects: list.length,
       students: list.reduce(
         (total, draft) => total + draft.students.filter((s) => s.trim()).length,
         0
@@ -100,10 +101,6 @@ export default function ProjectImportReview() {
       newSpaces: Array.from(newSpaces)
     };
   }, [drafts]);
-
-  const visibleDrafts = (drafts ?? []).filter(
-    (draft) => !onlyErrors || errors[draft.key]?.length
-  );
 
   const handleSubmit = useCallback(async () => {
     if (!drafts?.length || invalidCount) return;
@@ -117,7 +114,7 @@ export default function ProjectImportReview() {
         spaces: number;
       }>('/sigma/projects/import', toImportPayload(drafts));
 
-      clearDrafts();
+      projectDrafts.clear();
       toast.success(
         `${data.projects} projetos, ${data.students} integrantes e ${data.spaces} novos espaços cadastrados!`
       );
@@ -133,260 +130,201 @@ export default function ProjectImportReview() {
 
   if (drafts === null) return null;
 
-  if (!drafts.length) {
-    return (
-      <WrapperContent>
-        <HeaderContent>
-          <h3>Revisar Importação</h3>
-        </HeaderContent>
-        <Panel>
-          <p>Nenhum projeto para revisar. Envie uma planilha primeiro.</p>
-          <Actions>
-            <ActionButton
-              type="button"
-              onClick={() => push('/dashboard/projects/import')}
-            >
-              Enviar planilha
-            </ActionButton>
-          </Actions>
-        </Panel>
-      </WrapperContent>
-    );
-  }
+  const goToUpload = () => push('/dashboard/projects/import');
 
   return (
     <WrapperContent>
       <HeaderContent>
-        <h3>Revisar Importação</h3>
+        <h3>Revisar Importação de Projetos</h3>
 
         <HeaderButton href="/dashboard/projects/import">
           Enviar outra planilha
         </HeaderButton>
       </HeaderContent>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-        <Panel>
-          <Summary>
-            <div>
-              <strong>{summary.projects}</strong>
-              <span>projetos</span>
-            </div>
-            <div>
-              <strong>{summary.students}</strong>
-              <span>integrantes</span>
-            </div>
-            <div>
-              <strong>{summary.newSpaces.length}</strong>
-              <span>novos espaços</span>
-            </div>
-            <div>
-              <strong style={{ color: invalidCount ? '#dc3545' : '#28a745' }}>
-                {invalidCount}
-              </strong>
-              <span>com pendências</span>
-            </div>
-          </Summary>
+      {!drafts.length ? (
+        <EmptyReview onBack={goToUpload} />
+      ) : (
+        <PageStack>
+          <ReviewSummary
+            stats={[
+              { label: 'projetos', value: drafts.length },
+              {
+                label: 'integrantes',
+                value: summary.students,
+                color: COLORS.blue
+              },
+              {
+                label: 'novos espaços',
+                value: summary.newSpaces.length,
+                color: COLORS.purple
+              }
+            ]}
+            invalidCount={invalidCount}
+            submitLabel={`Cadastrar ${drafts.length} projetos`}
+            submitting={submitting}
+            onlyErrors={onlyErrors}
+            onToggleErrors={() => setOnlyErrors(!onlyErrors)}
+            onSubmit={handleSubmit}
+            onDiscard={() => {
+              projectDrafts.clear();
+              goToUpload();
+            }}
+          >
+            {summary.newSpaces.length ? (
+              <TipBox $color={COLORS.purple}>
+                <strong>📍 Espaços que serão criados: </strong>
+                {summary.newSpaces.join(', ')}
+              </TipBox>
+            ) : null}
+          </ReviewSummary>
 
-          {summary.newSpaces.length ? (
-            <p style={{ fontSize: '0.9em' }}>
-              Espaços que serão criados: {summary.newSpaces.join(', ')}
-            </p>
-          ) : null}
-
-          <Actions>
-            <ActionButton
-              type="button"
-              disabled={!!invalidCount || submitting}
-              onClick={handleSubmit}
-            >
-              {submitting
-                ? 'Cadastrando...'
-                : `Cadastrar ${summary.projects} projetos`}
-            </ActionButton>
-            <ActionButton
-              type="button"
-              variant="secondary"
-              onClick={() => setOnlyErrors(!onlyErrors)}
-            >
-              {onlyErrors ? 'Mostrar todos' : 'Mostrar só com pendências'}
-            </ActionButton>
-            <ActionButton
-              type="button"
-              variant="danger"
-              onClick={() => {
-                if (!confirm('Descartar todos os projetos desta importação?')) {
-                  return;
-                }
-                clearDrafts();
-                push('/dashboard/projects/import');
-              }}
-            >
-              Descartar importação
-            </ActionButton>
-          </Actions>
-
-          {invalidCount ? (
-            <p style={{ fontSize: '0.9em', color: '#b02a37' }}>
-              Corrija os cards destacados em vermelho para liberar o cadastro.
-            </p>
-          ) : null}
-        </Panel>
-
-        <CardGrid>
-          {visibleDrafts.map((draft) => {
-            const cardErrors = errors[draft.key] ?? [];
-
-            return (
-              <Card key={draft.key} invalid={!!cardErrors.length}>
-                <CardHeader>
-                  <span>Linha {draft.row} da planilha</span>
-                  <IconButton
-                    type="button"
-                    title="Remover projeto da importação"
-                    onClick={() =>
-                      updateDrafts(drafts.filter((d) => d.key !== draft.key))
-                    }
-                  >
-                    ✕
-                  </IconButton>
-                </CardHeader>
-
-                <Field>
-                  Título
-                  <input
-                    value={draft.title}
-                    onChange={(e) =>
-                      updateDraft(draft.key, { title: e.target.value })
-                    }
-                  />
-                </Field>
-
-                <Field>
-                  Subtítulo
-                  <input
-                    value={draft.subtitle}
-                    onChange={(e) =>
-                      updateDraft(draft.key, { subtitle: e.target.value })
-                    }
-                  />
-                </Field>
-
-                <Row>
-                  <Field>
-                    Espaço
-                    <select
-                      value={draft.spaceId ? String(draft.spaceId) : NEW_SPACE}
+          <CardGrid $min={340}>
+            {drafts
+              .filter((draft) => !onlyErrors || errors[draft.key]?.length)
+              .map((draft) => (
+                <ReviewCard
+                  key={draft.key}
+                  line={draft.row}
+                  errors={errors[draft.key] ?? []}
+                  warnings={draft.warnings}
+                  onRemove={() =>
+                    updateDrafts(drafts.filter((d) => d.key !== draft.key))
+                  }
+                >
+                  <FieldLabel>
+                    Título
+                    <TextInput
+                      value={draft.title}
+                      placeholder="Título do projeto"
                       onChange={(e) =>
-                        updateDraft(
-                          draft.key,
-                          e.target.value === NEW_SPACE
-                            ? { spaceId: null }
-                            : { spaceId: Number(e.target.value) }
-                        )
-                      }
-                    >
-                      {spaces.map((space) => (
-                        <option key={space.id} value={space.id}>
-                          {space.name}
-                        </option>
-                      ))}
-                      <option value={NEW_SPACE}>+ Novo espaço</option>
-                    </select>
-                  </Field>
-
-                  <Field>
-                    Horário
-                    <select
-                      value={draft.schedule}
-                      onChange={(e) =>
-                        updateDraft(draft.key, { schedule: e.target.value })
-                      }
-                    >
-                      <option value="">Selecionar</option>
-                      {SCHEDULES.map((schedule) => (
-                        <option key={schedule} value={schedule}>
-                          {schedule}
-                        </option>
-                      ))}
-                    </select>
-                  </Field>
-                </Row>
-
-                {!draft.spaceId ? (
-                  <Field>
-                    Nome do novo espaço
-                    <input
-                      value={draft.spaceName}
-                      placeholder="Ex.: Laboratório 2"
-                      onChange={(e) =>
-                        updateDraft(draft.key, { spaceName: e.target.value })
+                        updateDraft(draft.key, { title: e.target.value })
                       }
                     />
-                  </Field>
-                ) : null}
+                  </FieldLabel>
 
-                <Field as="div">
-                  Integrantes ({draft.students.filter((s) => s.trim()).length})
-                  {draft.students.map((student, index) => (
-                    <StudentLine key={index}>
-                      <input
-                        value={student}
-                        placeholder={`Integrante ${index + 1}`}
+                  <FieldLabel>
+                    Subtítulo
+                    <TextInput
+                      value={draft.subtitle}
+                      placeholder="Subtítulo do projeto"
+                      onChange={(e) =>
+                        updateDraft(draft.key, { subtitle: e.target.value })
+                      }
+                    />
+                  </FieldLabel>
+
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: '1fr 1fr',
+                      gap: '12px'
+                    }}
+                  >
+                    <FieldLabel>
+                      📍 Espaço
+                      <SelectInput
+                        value={
+                          draft.spaceId ? String(draft.spaceId) : NEW_SPACE
+                        }
                         onChange={(e) =>
-                          updateDraft(draft.key, {
-                            students: draft.students.map((s, i) =>
-                              i === index ? e.target.value : s
-                            )
-                          })
+                          updateDraft(
+                            draft.key,
+                            e.target.value === NEW_SPACE
+                              ? { spaceId: null }
+                              : { spaceId: Number(e.target.value) }
+                          )
+                        }
+                      >
+                        {spaces.map((space) => (
+                          <option key={space.id} value={space.id}>
+                            {space.name}
+                          </option>
+                        ))}
+                        <option value={NEW_SPACE}>+ Novo espaço</option>
+                      </SelectInput>
+                    </FieldLabel>
+
+                    <FieldLabel>
+                      ⏰ Horário
+                      <SelectInput
+                        value={draft.schedule}
+                        onChange={(e) =>
+                          updateDraft(draft.key, { schedule: e.target.value })
+                        }
+                      >
+                        <option value="">Selecionar</option>
+                        {SCHEDULES.map((schedule) => (
+                          <option key={schedule} value={schedule}>
+                            {schedule}
+                          </option>
+                        ))}
+                      </SelectInput>
+                    </FieldLabel>
+                  </div>
+
+                  {!draft.spaceId ? (
+                    <FieldLabel>
+                      Nome do novo espaço
+                      <TextInput
+                        value={draft.spaceName}
+                        placeholder="Ex.: Laboratório 2"
+                        onChange={(e) =>
+                          updateDraft(draft.key, { spaceName: e.target.value })
                         }
                       />
-                      <IconButton
+                    </FieldLabel>
+                  ) : null}
+
+                  <FieldLabel as="div">
+                    👥 Integrantes (
+                    {draft.students.filter((s) => s.trim()).length})
+                    {draft.students.map((student, index) => (
+                      <div key={index} style={{ display: 'flex', gap: '6px' }}>
+                        <TextInput
+                          value={student}
+                          placeholder={`Integrante ${index + 1}`}
+                          onChange={(e) =>
+                            updateDraft(draft.key, {
+                              students: draft.students.map((s, i) =>
+                                i === index ? e.target.value : s
+                              )
+                            })
+                          }
+                        />
+                        <IconButton
+                          type="button"
+                          title="Remover integrante"
+                          onClick={() =>
+                            updateDraft(draft.key, {
+                              students: draft.students.filter(
+                                (_, i) => i !== index
+                              )
+                            })
+                          }
+                        >
+                          <RemoveIcon />
+                        </IconButton>
+                      </div>
+                    ))}
+                    <div>
+                      <OutlineButton
                         type="button"
-                        title="Remover integrante"
                         onClick={() =>
                           updateDraft(draft.key, {
-                            students: draft.students.filter(
-                              (_, i) => i !== index
-                            )
+                            students: [...draft.students, '']
                           })
                         }
                       >
-                        ✕
-                      </IconButton>
-                    </StudentLine>
-                  ))}
-                  <LinkButton
-                    type="button"
-                    onClick={() =>
-                      updateDraft(draft.key, {
-                        students: [...draft.students, '']
-                      })
-                    }
-                  >
-                    + Adicionar integrante
-                  </LinkButton>
-                </Field>
-
-                {draft.warnings.length ? (
-                  <Messages kind="warning">
-                    {draft.warnings.map((warning) => (
-                      <li key={warning}>{warning}</li>
-                    ))}
-                  </Messages>
-                ) : null}
-
-                {cardErrors.length ? (
-                  <Messages kind="error">
-                    {cardErrors.map((error) => (
-                      <li key={error}>{error}</li>
-                    ))}
-                  </Messages>
-                ) : null}
-              </Card>
-            );
-          })}
-        </CardGrid>
-      </div>
+                        + Adicionar integrante
+                      </OutlineButton>
+                    </div>
+                  </FieldLabel>
+                </ReviewCard>
+              ))}
+          </CardGrid>
+        </PageStack>
+      )}
     </WrapperContent>
   );
 }

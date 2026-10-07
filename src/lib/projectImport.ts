@@ -1,6 +1,18 @@
-import * as XLSX from 'xlsx';
+import {
+  Space,
+  addSheet,
+  cellText,
+  downloadWorkbook,
+  draftKey,
+  draftStorage,
+  findColumn,
+  newWorkbook,
+  normalizeText,
+  readSheet,
+  spacesSheetRows
+} from './spreadsheet';
 
-export type Space = { id: number; name: string };
+export type { Space };
 
 export type ExistingProject = { title: string; subtitle: string };
 
@@ -17,7 +29,9 @@ export type ProjectDraft = {
   warnings: string[];
 };
 
-export const STORAGE_KEY = 'sigma:project-import';
+export const projectDrafts = draftStorage<ProjectDraft[]>(
+  'sigma:project-import'
+);
 
 export const PROJECTS_SHEET = 'Projetos';
 export const STUDENT_COLUMNS = 8;
@@ -34,13 +48,6 @@ const HEADERS = [
 export const SCHEDULES = Array.from({ length: 11 }, (_, i) => i + 8).flatMap(
   (hour) => ['00', '15', '30', '45'].map((min) => `${hour}:${min}`)
 );
-
-export const normalizeText = (value: unknown) =>
-  String(value ?? '')
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
-    .trim()
-    .toUpperCase();
 
 export const projectKey = (title: string, subtitle: string) =>
   `${title.trim().toUpperCase()}|${subtitle.trim().toUpperCase()}`;
@@ -64,111 +71,79 @@ export function parseSchedule(value: unknown): string | null {
   return formatTime(Number(match[1]), Number(match[2] ?? 0));
 }
 
-export function buildTemplate(spaces: Space[]) {
-  const workbook = XLSX.utils.book_new();
-
-  const projects = XLSX.utils.aoa_to_sheet([HEADERS]);
-  projects['!cols'] = HEADERS.map((_, i) => ({ wch: i < 2 ? 40 : 22 }));
-  XLSX.utils.book_append_sheet(workbook, projects, PROJECTS_SHEET);
-
-  const instructions = XLSX.utils.aoa_to_sheet([
-    ['Como preencher'],
-    [],
-    [
-      '1. Preencha a aba "Projetos": uma linha por projeto, a partir da linha 2.'
-    ],
-    ['2. Não altere os nomes das colunas da linha 1.'],
-    ['3. Título, Espaço, Horário e pelo menos um Integrante são obrigatórios.'],
-    [
-      '4. Espaço: use um nome da aba "Espaços". Um nome novo cria um novo espaço.'
-    ],
-    [
-      '5. Horário: entre 8:00 e 18:45, de 15 em 15 minutos (ex.: 9:00, 9:15, 9:30).'
-    ],
-    [
-      `6. Até ${STUDENT_COLUMNS} integrantes por projeto. Para mais, adicione colunas "Integrante 9", "Integrante 10"...`
-    ],
-    [
-      '7. Depois do envio, todos os dados podem ser revisados e editados antes do cadastro.'
-    ],
-    [],
-    ['Exemplo:'],
-    HEADERS.slice(0, 7),
-    [
-      'Cidades Sustentáveis',
-      'Energia solar nas escolas',
-      spaces[0]?.name ?? 'Espaço Maker',
-      '9:00',
-      'Ana Souza',
-      'Bruno Lima',
-      'Carla Dias'
-    ]
-  ]);
-  instructions['!cols'] = [
-    { wch: 40 },
-    { wch: 30 },
-    ...HEADERS.map(() => ({ wch: 18 }))
-  ];
-  XLSX.utils.book_append_sheet(workbook, instructions, 'Instruções');
-
-  const spacesSheet = XLSX.utils.aoa_to_sheet([
-    ['Espaços cadastrados'],
-    ...spaces.map((space) => [space.name])
-  ]);
-  spacesSheet['!cols'] = [{ wch: 40 }];
-  XLSX.utils.book_append_sheet(workbook, spacesSheet, 'Espaços');
-
-  return workbook;
-}
-
 export function downloadTemplate(spaces: Space[]) {
-  XLSX.writeFile(buildTemplate(spaces), 'modelo-cadastro-projetos.xls', {
-    bookType: 'xls'
-  });
-}
+  const workbook = newWorkbook();
 
-type ColumnMap = {
-  title: number;
-  subtitle: number;
-  space: number;
-  schedule: number;
-  students: number[];
-};
+  addSheet(
+    workbook,
+    PROJECTS_SHEET,
+    [HEADERS],
+    HEADERS.map((_, i) => (i < 2 ? 40 : 22))
+  );
 
-function mapColumns(header: unknown[]): ColumnMap {
-  const names = header.map((cell) => normalizeText(cell));
-  const find = (...options: string[]) =>
-    names.findIndex((name) => options.includes(name));
+  addSheet(
+    workbook,
+    'Instruções',
+    [
+      ['Como preencher'],
+      [],
+      [
+        '1. Preencha a aba "Projetos": uma linha por projeto, a partir da linha 2.'
+      ],
+      ['2. Não altere os nomes das colunas da linha 1.'],
+      [
+        '3. Título, Espaço, Horário e pelo menos um Integrante são obrigatórios.'
+      ],
+      [
+        '4. Espaço: use um nome da aba "Espaços". Um nome novo cria um novo espaço.'
+      ],
+      [
+        '5. Horário: entre 8:00 e 18:45, de 15 em 15 minutos (ex.: 9:00, 9:15, 9:30).'
+      ],
+      [
+        `6. Até ${STUDENT_COLUMNS} integrantes por projeto. Para mais, adicione colunas "Integrante 9", "Integrante 10"...`
+      ],
+      [
+        '7. Depois do envio, todos os dados podem ser revisados e editados antes do cadastro.'
+      ],
+      [],
+      ['Exemplo:'],
+      HEADERS.slice(0, 7),
+      [
+        'Cidades Sustentáveis',
+        'Energia solar nas escolas',
+        spaces[0]?.name ?? 'Espaço Maker',
+        '9:00',
+        'Ana Souza',
+        'Bruno Lima',
+        'Carla Dias'
+      ]
+    ],
+    [40, 30, ...HEADERS.map(() => 18)]
+  );
 
-  return {
-    title: find('TITULO', 'PROJETO'),
-    subtitle: find('SUBTITULO', 'SUB TITULO'),
-    space: find('ESPACO'),
-    schedule: find('HORARIO'),
-    students: names.reduce<number[]>(
-      (acc, name, index) =>
-        /^(INTEGRANTE|ALUNO)/.test(name) ? [...acc, index] : acc,
-      []
-    )
-  };
+  addSheet(workbook, 'Espaços', spacesSheetRows(spaces), [40]);
+
+  downloadWorkbook(workbook, 'modelo-cadastro-projetos.xls');
 }
 
 export async function parseProjectsFile(
   file: File,
   spaces: Space[]
 ): Promise<ProjectDraft[]> {
-  const workbook = XLSX.read(await file.arrayBuffer(), { type: 'array' });
-  const sheet =
-    workbook.Sheets[PROJECTS_SHEET] ?? workbook.Sheets[workbook.SheetNames[0]];
+  const { header, rows } = await readSheet(file, PROJECTS_SHEET);
 
-  const rows = XLSX.utils.sheet_to_json<unknown[]>(sheet, {
-    header: 1,
-    raw: true,
-    defval: ''
-  });
-
-  const [header = [], ...body] = rows;
-  const columns = mapColumns(header);
+  const columns = {
+    title: findColumn(header, 'TITULO', 'PROJETO'),
+    subtitle: findColumn(header, 'SUBTITULO', 'SUB TITULO'),
+    space: findColumn(header, 'ESPACO'),
+    schedule: findColumn(header, 'HORARIO'),
+    students: header
+      .map(normalizeText)
+      .flatMap((name, index) =>
+        /^(INTEGRANTE|ALUNO)/.test(name) ? [index] : []
+      )
+  };
 
   if (columns.title < 0 || columns.space < 0 || columns.schedule < 0) {
     throw new Error(
@@ -179,49 +154,44 @@ export async function parseProjectsFile(
   const spacesByName = new Map(
     spaces.map((space) => [normalizeText(space.name), space])
   );
-  const cell = (row: unknown[], index: number) =>
-    index < 0 ? '' : String(row[index] ?? '').trim();
 
-  return body
-    .map((row, index) => ({ row, line: index + 2 }))
-    .filter(({ row }) => row.some((value) => String(value ?? '').trim()))
-    .map(({ row, line }) => {
-      const warnings: string[] = [];
+  return rows.map(({ row, line }) => {
+    const warnings: string[] = [];
 
-      const rawSchedule = row[columns.schedule];
-      const parsedSchedule = parseSchedule(rawSchedule);
-      const schedule =
-        parsedSchedule && SCHEDULES.includes(parsedSchedule)
-          ? parsedSchedule
-          : '';
+    const rawSchedule = row[columns.schedule];
+    const parsedSchedule = parseSchedule(rawSchedule);
+    const schedule =
+      parsedSchedule && SCHEDULES.includes(parsedSchedule)
+        ? parsedSchedule
+        : '';
 
-      if (!schedule && String(rawSchedule ?? '').trim()) {
-        warnings.push(`Horário "${rawSchedule}" da planilha não é válido.`);
-      }
+    if (!schedule && String(rawSchedule ?? '').trim()) {
+      warnings.push(`Horário "${rawSchedule}" da planilha não é válido.`);
+    }
 
-      const spaceName = cell(row, columns.space);
-      const space = spacesByName.get(normalizeText(spaceName));
+    const spaceName = cellText(row, columns.space);
+    const space = spacesByName.get(normalizeText(spaceName));
 
-      if (spaceName && !space) {
-        warnings.push(
-          `Espaço "${spaceName}" da planilha não existe; marcado como novo espaço.`
-        );
-      }
+    if (spaceName && !space) {
+      warnings.push(
+        `Espaço "${spaceName}" da planilha não existe; marcado como novo espaço.`
+      );
+    }
 
-      return {
-        key: `${line}-${Math.random().toString(36).slice(2)}`,
-        row: line,
-        title: cell(row, columns.title),
-        subtitle: cell(row, columns.subtitle),
-        schedule,
-        spaceId: space?.id ?? null,
-        spaceName: space ? '' : spaceName,
-        students: columns.students
-          .map((index) => cell(row, index))
-          .filter(Boolean),
-        warnings
-      };
-    });
+    return {
+      key: draftKey(line),
+      row: line,
+      title: cellText(row, columns.title),
+      subtitle: cellText(row, columns.subtitle),
+      schedule,
+      spaceId: space?.id ?? null,
+      spaceName: space ? '' : spaceName,
+      students: columns.students
+        .map((index) => cellText(row, index))
+        .filter(Boolean),
+      warnings
+    };
+  });
 }
 
 export function validateDrafts(
@@ -276,29 +246,4 @@ export function toImportPayload(drafts: ProjectDraft[]) {
       students: draft.students.map((name) => name.trim()).filter(Boolean)
     }))
   };
-}
-
-export function saveDrafts(drafts: ProjectDraft[]) {
-  try {
-    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(drafts));
-  } catch {
-    // sessionStorage indisponível: os dados ficam só em memória
-  }
-}
-
-export function loadDrafts(): ProjectDraft[] | null {
-  try {
-    const value = sessionStorage.getItem(STORAGE_KEY);
-    return value ? (JSON.parse(value) as ProjectDraft[]) : null;
-  } catch {
-    return null;
-  }
-}
-
-export function clearDrafts() {
-  try {
-    sessionStorage.removeItem(STORAGE_KEY);
-  } catch {
-    // ignora
-  }
 }

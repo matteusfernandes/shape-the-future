@@ -1,356 +1,823 @@
-import styled from 'styled-components';
+'use client';
 
-export const Container = styled.div`
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-`;
+import styled, { css } from 'styled-components';
 
-/* Dropdown para Mobile */
-export const MobileDropdown = styled.div`
-  display: none;
-  position: relative;
-  /* Só precisa abrir por cima dos cards; o menu da navbar fica acima */
-  z-index: 2;
+// Tokens do redesign do cronograma (design_handoff_cronograma)
+const T = {
+  navy: '#141E53',
+  heroFrom: '#717cba',
+  heroTo: '#5a6699',
+  page: '#f5f5f5',
+  surface: '#fff',
+  tint: '#EEF0FA',
+  tintHover: '#dfe2f3',
+  ring: '#d6daf0',
+  border: '#e3e5f0',
+  borderSoft: '#f0f1f6',
+  dashed: '#c9cde3',
+  text2: '#4a5280',
+  meta: '#5a6699',
+  placeholder: '#7a80a8',
+  now: '#55B47A',
+  focus: '#EC72A1'
+};
 
-  @media (max-width: 768px) {
-    display: block;
-    padding: 15px;
-    background: linear-gradient(135deg, #717cba 0%, #5a6699 100%);
+const MOBILE = '@media (max-width: 768px)';
+
+const focusRing = css`
+  &:focus-visible {
+    outline: 3px solid ${T.focus};
+    outline-offset: 2px;
   }
 `;
 
-export const MobileDropdownButton = styled.button`
-  width: 100%;
-  padding: 16px;
-  background: rgba(255, 255, 255, 0.15);
+const resetButton = css`
+  appearance: none;
+  border: none;
+  background: none;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  ${focusRing}
+`;
+
+export const Page = styled.div`
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  background: ${T.page};
+  color: ${T.navy};
+  line-height: normal;
+`;
+
+/* ---------- 1. Hero ---------- */
+
+export const Hero = styled.section`
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 44px 48px 40px;
+  background: linear-gradient(135deg, ${T.heroFrom} 0%, ${T.heroTo} 100%);
   color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 8px;
+
+  ${MOBILE} {
+    gap: 16px;
+    padding: 24px 16px;
+  }
+`;
+
+export const HeroHeading = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  ${MOBILE} {
+    gap: 4px;
+  }
+`;
+
+export const Kicker = styled.div`
   font-size: 16px;
   font-weight: 600;
-  text-align: left;
-  cursor: pointer;
+  letter-spacing: 0.08em;
+
+  ${MOBILE} {
+    font-size: 14px;
+  }
+`;
+
+export const HeroTitle = styled.h1`
+  margin: 0;
+  font-size: 44px;
+  font-weight: 800;
+  line-height: 1.15;
+  text-wrap: pretty;
+
+  ${MOBILE} {
+    font-size: 28px;
+    line-height: 1.2;
+  }
+`;
+
+export const HeroRow = styled.div`
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 20px;
+  align-items: stretch;
+
+  ${MOBILE} {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+`;
+
+export const SearchField = styled.label`
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  transition: all 0.3s ease;
-
-  span {
-    font-size: 12px;
-  }
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.2);
-  }
-
-  &:active {
-    transform: scale(0.98);
-  }
-`;
-
-export const MobileDropdownList = styled.div`
-  position: absolute;
-  top: 100%;
-  left: 15px;
-  right: 15px;
-  margin-top: 5px;
+  gap: 14px;
+  height: 68px;
+  padding: 0 20px;
   background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  max-height: 300px;
-  overflow-y: auto;
-  animation: slideDown 0.2s ease;
+  border-radius: 14px;
+  color: ${T.navy};
 
-  @keyframes slideDown {
-    from {
-      opacity: 0;
-      transform: translateY(-10px);
+  svg {
+    flex: none;
+  }
+
+  ${MOBILE} {
+    gap: 10px;
+    height: 56px;
+    padding: 0 14px;
+    border-radius: 12px;
+
+    svg {
+      width: 22px;
+      height: 22px;
     }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  /* Estilização da scrollbar */
-  &::-webkit-scrollbar {
-    width: 6px;
-  }
-  
-  &::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.05);
-  }
-  
-  &::-webkit-scrollbar-thumb {
-    background: rgba(113, 124, 186, 0.3);
-    border-radius: 3px;
   }
 `;
 
-type MobileDropdownItemProps = {
-  isActive: boolean;
-};
+export const SearchInput = styled.input`
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  appearance: none;
+  font: inherit;
+  font-size: 21px;
+  font-weight: 500;
+  color: ${T.navy};
+  ${focusRing}
 
-export const MobileDropdownItem = styled.div<MobileDropdownItemProps>`
-  padding: 14px 16px;
-  color: ${({ isActive }) => (isActive ? '#717cba' : '#333')};
-  background: ${({ isActive }) => (isActive ? 'rgba(113, 124, 186, 0.1)' : 'transparent')};
-  font-weight: ${({ isActive }) => (isActive ? '600' : '400')};
-  border-left: 3px solid ${({ isActive }) => (isActive ? '#717cba' : 'transparent')};
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  &:hover {
-    background: rgba(113, 124, 186, 0.05);
+  &::placeholder {
+    color: ${T.placeholder};
   }
 
-  &:first-child {
-    border-top-left-radius: 8px;
-    border-top-right-radius: 8px;
-  }
-
-  &:last-child {
-    border-bottom-left-radius: 8px;
-    border-bottom-right-radius: 8px;
-  }
-`;
-
-export const Content = styled.div`
-  display: flex;
-  gap: 0;
-  min-height: 600px;
-  overflow: hidden;
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-    min-height: 500px;
-  }
-`;
-
-export const Sidebar = styled.div`
-  width: 280px;
-  background: linear-gradient(135deg, #717cba 0%, #5a6699 100%);
-  padding: 20px;
-  border-right: 2px solid rgba(255, 255, 255, 0.1);
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-
-  h2 {
-    color: #fff;
-    font-size: 20px;
-    font-weight: 700;
-    margin-bottom: 20px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    flex-shrink: 0;
-  }
-
-  /* Estilização da scrollbar */
-  &::-webkit-scrollbar {
-    width: 6px;
-  }
-  
-  &::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.05);
-  }
-  
-  &::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 3px;
-  }
-  
-  &::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.3);
-  }
-
-  @media (max-width: 768px) {
+  /* Remove o "x" nativo do campo de busca */
+  &::-webkit-search-cancel-button {
     display: none;
   }
+
+  ${MOBILE} {
+    font-size: 18px;
+  }
 `;
 
-type SpaceItemProps = {
-  isActive: boolean;
-};
-
-export const SpaceItem = styled.div<SpaceItemProps>`
-  padding: 16px;
-  margin-bottom: 8px;
-  background: ${({ isActive }) =>
-    isActive ? 'rgba(255, 255, 255, 0.2)' : 'rgba(255, 255, 255, 0.05)'};
-  color: #fff;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-weight: ${({ isActive }) => (isActive ? '600' : '400')};
-  border-left: 4px solid ${({ isActive }) => (isActive ? '#fff' : 'transparent')};
+export const ClearButton = styled.button`
+  ${resetButton}
+  flex: none;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: ${T.tint};
+  font-size: 15px;
+  font-weight: 700;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.15);
-    transform: translateX(4px);
+    background: ${T.tintHover};
+  }
+
+  ${MOBILE} {
+    padding: 8px 10px;
+    border-radius: 8px;
+    font-size: 14px;
   }
 `;
 
-export const MainContent = styled.div`
-  flex: 1;
-  padding: 30px;
-  background: #f5f5f5;
+export const SessionSwitch = styled.div`
+  display: flex;
+  gap: 8px;
+  padding: 6px;
+  background: rgba(20, 30, 83, 0.25);
+  border-radius: 14px;
+
+  ${MOBILE} {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+    padding: 5px;
+    border-radius: 12px;
+  }
+`;
+
+export const SessionButton = styled.button<{ $active: boolean }>`
+  ${resetButton}
   display: flex;
   flex-direction: column;
-  min-height: 0;
-  overflow: hidden;
+  justify-content: center;
+  gap: 2px;
+  min-width: 150px;
+  min-height: 56px;
+  padding: 0 18px;
+  border-radius: 10px;
+  text-align: left;
+  background: ${({ $active }) => ($active ? '#fff' : 'transparent')};
+  color: ${({ $active }) => ($active ? T.navy : '#fff')};
 
-  @media (max-width: 768px) {
-    padding: 20px;
+  &:hover {
+    filter: brightness(1.06);
+  }
+
+  ${MOBILE} {
+    min-width: 0;
+    padding: 6px 10px;
+    border-radius: 9px;
   }
 `;
 
-export const HeaderContent = styled.div`
+export const SessionLabel = styled.span`
   display: flex;
   align-items: center;
-  gap: 20px;
-  margin-bottom: 30px;
-  flex-shrink: 0;
-  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 17px;
+  font-weight: 700;
 
-  h1 {
-    color: #141E53;
-    font-size: 32px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin: 0;
-    flex-shrink: 0;
+  /* Rótulo curto ("Tudo") só no mobile */
+  .short {
+    display: none;
   }
 
-  /* Seletor de sessão */
-  > div {
-    flex-shrink: 0;
-  }
+  ${MOBILE} {
+    gap: 6px;
+    font-size: 15px;
 
-  @media (max-width: 768px) {
-    gap: 15px;
-    margin-bottom: 20px;
-
-    h1 {
-      font-size: 24px;
-      width: 100%;
+    .long {
+      display: none;
     }
 
-    > div {
-      width: 100%;
+    .short {
+      display: inline;
     }
   }
 `;
 
-export const ProjectList = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  overflow-y: auto;
-  flex: 1;
-  min-height: 0;
-  padding-right: 10px;
+export const Dot = styled.span<{ $color: string }>`
+  flex: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: ${({ $color }) => $color};
 
-  /* Estilização da scrollbar */
-  &::-webkit-scrollbar {
-    width: 8px;
-  }
-  
-  &::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.05);
-    border-radius: 4px;
-  }
-  
-  &::-webkit-scrollbar-thumb {
-    background: rgba(113, 124, 186, 0.3);
-    border-radius: 4px;
-  }
-  
-  &::-webkit-scrollbar-thumb:hover {
-    background: rgba(113, 124, 186, 0.5);
+  ${MOBILE} {
+    width: 10px;
+    height: 10px;
   }
 `;
 
-export const SessionBanner = styled.div<{ $color: string; $soft: string }>`
+export const SessionRange = styled.span`
+  font-size: 14px;
+  font-weight: 500;
+
+  ${MOBILE} {
+    font-size: 12px;
+  }
+`;
+
+export const NowBanner = styled.div`
   display: flex;
   align-items: center;
   gap: 12px;
-  flex-wrap: wrap;
-  margin-bottom: 20px;
-  padding: 14px 18px;
-  background-color: ${({ $soft }) => $soft};
-  border-left: 6px solid ${({ $color }) => $color};
-  border-radius: 8px;
-  color: #141e53;
-  font-size: 15px;
-  flex-shrink: 0;
+  font-size: 18px;
+  font-weight: 600;
 
-  strong {
+  ${MOBILE} {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    font-size: 15px;
+  }
+`;
+
+export const NowPill = styled.span<{ $small?: boolean }>`
+  flex: none;
+  padding: ${({ $small }) => ($small ? '5px 12px' : '6px 12px')};
+  border-radius: 999px;
+  background: ${T.now};
+  color: ${T.navy};
+  font-size: 14px;
+  font-weight: 800;
+
+  ${MOBILE} {
+    padding: ${({ $small }) => ($small ? '4px 10px' : '5px 10px')};
+    font-size: ${({ $small }) => ($small ? '12px' : '13px')};
+  }
+`;
+
+/* ---------- 2. Filtro de espaços ---------- */
+
+export const SpaceBar = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 48px;
+  background: #fff;
+  border-bottom: 2px solid ${T.border};
+
+  ${MOBILE} {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    gap: 8px;
+    padding: 12px 16px;
+  }
+`;
+
+export const SpaceLabel = styled.span`
+  margin-right: 6px;
+  font-size: 16px;
+  font-weight: 700;
+
+  ${MOBILE} {
+    margin-right: 0;
+    font-size: 15px;
+  }
+`;
+
+export const SpacePills = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+
+  ${MOBILE} {
+    flex-wrap: nowrap;
+    gap: 8px;
+    padding-bottom: 4px;
+    overflow-x: auto;
+  }
+`;
+
+export const SpacePill = styled.button<{ $active: boolean }>`
+  ${resetButton}
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 48px;
+  padding: 0 18px;
+  border: 2px solid ${T.navy};
+  border-radius: 999px;
+  font-size: 16px;
+  font-weight: 600;
+  white-space: nowrap;
+  background: ${({ $active }) => ($active ? T.navy : '#fff')};
+  color: ${({ $active }) => ($active ? '#fff' : T.navy)};
+
+  &:hover {
+    box-shadow: 0 0 0 3px ${T.ring};
+  }
+
+  ${MOBILE} {
+    flex: none;
+    gap: 6px;
+    padding: 0 14px;
+    font-size: 15px;
+  }
+`;
+
+export const SpaceCount = styled.span<{ $active: boolean }>`
+  min-width: 26px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: ${T.navy};
+  background: ${({ $active }) => ($active ? '#fff' : T.tint)};
+
+  ${MOBILE} {
+    min-width: 0;
+    padding: 2px 7px;
+    font-size: 12px;
+  }
+`;
+
+/* ---------- 3. Lista ---------- */
+
+// Ocupa só o espaço restante do contêiner do site, sem altura mínima própria
+export const Main = styled.main`
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 28px;
+  padding: 32px 48px 56px;
+
+  ${MOBILE} {
+    gap: 20px;
+    padding: 20px 16px 40px;
+  }
+`;
+
+export const SummaryRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+
+  ${MOBILE} {
+    gap: 12px;
+  }
+`;
+
+export const Summary = styled.div`
+  font-size: 20px;
+  font-weight: 700;
+
+  ${MOBILE} {
     font-size: 17px;
   }
 `;
 
-export const ProjectCard = styled.div<{ $color: string }>`
-  background: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s ease;
-  border-left: 6px solid ${({ $color }) => $color};
+export const ShowAllLink = styled.button`
+  ${resetButton}
+  flex: none;
+  font-size: 16px;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 4px;
 
   &:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-    transform: translateY(-2px);
+    color: ${T.meta};
+  }
+
+  ${MOBILE} {
+    padding: 12px 0;
+    font-size: 15px;
   }
 `;
 
-export const ProjectMeta = styled.div`
+export const SessionGroup = styled.section`
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+
+  ${MOBILE} {
+    gap: 20px;
+  }
+`;
+
+export const Interval = styled.div`
   display: flex;
   align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-bottom: 10px;
-`;
-
-export const Chip = styled.span<{ $color: string; $bg: string }>`
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 13px;
-  font-weight: 700;
-  color: ${({ $color }) => $color};
-  background-color: ${({ $bg }) => $bg};
-`;
-
-export const ProjectTitle = styled.h3`
-  color: #141E53;
+  gap: 16px;
+  color: ${T.meta};
   font-size: 18px;
   font-weight: 700;
-  margin-bottom: 12px;
-  text-transform: uppercase;
-  line-height: 1.4;
+
+  &::before,
+  &::after {
+    content: '';
+    flex: 1;
+    border-top: 3px dashed ${T.dashed};
+  }
+
+  ${MOBILE} {
+    gap: 10px;
+    font-size: 15px;
+  }
 `;
 
-export const ProjectParticipants = styled.p`
-  color: #666;
-  font-size: 14px;
-  line-height: 1.6;
-`;
-
-export const EmptyState = styled.div`
+export const SessionBody = styled.div`
   display: flex;
+  flex-direction: column;
+
+  ${MOBILE} {
+    gap: 14px;
+  }
+`;
+
+export const SessionHeader = styled.h2<{ $color: string }>`
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  margin: 0;
+  padding: 16px 24px;
+  border-radius: 14px;
+  background: ${({ $color }) => $color};
+  color: ${T.navy};
+  font-weight: inherit;
+
+  .label {
+    font-size: 26px;
+    font-weight: 800;
+  }
+
+  .range {
+    font-size: 20px;
+    font-weight: 600;
+  }
+
+  .count {
+    margin-left: auto;
+    font-size: 17px;
+    font-weight: 700;
+  }
+
+  ${MOBILE} {
+    flex-wrap: wrap;
+    gap: 4px 10px;
+    padding: 14px 16px;
+    border-radius: 12px;
+
+    .label {
+      font-size: 21px;
+    }
+
+    .range {
+      font-size: 16px;
+    }
+
+    .count {
+      display: none;
+    }
+  }
+`;
+
+export const SessionEmpty = styled.p`
+  margin: 0;
+  padding: 24px 4px;
+  font-size: 18px;
+  color: ${T.meta};
+
+  ${MOBILE} {
+    padding: 4px;
+    font-size: 16px;
+  }
+`;
+
+export const SlotRow = styled.div<{ $past: boolean }>`
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  gap: 28px;
+  padding: 24px 0;
+  border-bottom: 2px solid ${T.border};
+  opacity: ${({ $past }) => ($past ? 0.5 : 1)};
+
+  ${MOBILE} {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 0;
+    border-bottom: none;
+  }
+`;
+
+export const SlotTime = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  .time {
+    font-size: 40px;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+
+  .until {
+    font-size: 16px;
+    font-weight: 500;
+    color: ${T.meta};
+  }
+
+  .past {
+    margin-top: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: ${T.meta};
+  }
+
+  ${NowPill} {
+    align-self: flex-start;
+    margin-top: 8px;
+  }
+
+  ${MOBILE} {
+    flex-direction: row;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 10px;
+
+    .time {
+      font-size: 30px;
+      letter-spacing: normal;
+    }
+
+    .until {
+      font-size: 15px;
+      font-weight: 400;
+    }
+
+    .past {
+      margin-top: 0;
+      font-size: 13px;
+    }
+
+    ${NowPill} {
+      align-self: auto;
+      margin-top: 0;
+    }
+  }
+`;
+
+export const Cards = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+
+  ${MOBILE} {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+`;
+
+export const Card = styled.article<{ $now: boolean }>`
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px 22px;
+  background: #fff;
+  border: 2px solid ${({ $now }) => ($now ? T.navy : T.border)};
+  border-radius: 16px;
+
+  ${MOBILE} {
+    gap: 10px;
+    padding: 16px;
+    border-radius: 14px;
+  }
+`;
+
+export const Tags = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  ${MOBILE} {
+    gap: 6px;
+  }
+`;
+
+export const SpaceTag = styled.span`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 10px;
+  background: ${T.tint};
+  font-size: 16px;
+  font-weight: 700;
+
+  ${MOBILE} {
+    padding: 5px 10px;
+    border-radius: 9px;
+    font-size: 15px;
+
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+  }
+`;
+
+export const FinalistTag = styled.span`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 10px;
+  background: ${T.navy};
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+
+  ${MOBILE} {
+    gap: 5px;
+    padding: 5px 10px;
+    border-radius: 9px;
+    font-size: 13px;
+
+    svg {
+      width: 14px;
+      height: 14px;
+    }
+  }
+`;
+
+export const CardText = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  h3 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.3;
+    text-wrap: pretty;
+  }
+
+  p {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.45;
+    color: ${T.text2};
+  }
+
+  ${MOBILE} {
+    gap: 3px;
+
+    h3 {
+      font-size: 19px;
+    }
+
+    p {
+      font-size: 15px;
+    }
+  }
+`;
+
+export const People = styled.div`
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding-top: 12px;
+  border-top: 2px solid ${T.borderSoft};
+  font-size: 16px;
+  line-height: 1.5;
+
+  ${MOBILE} {
+    gap: 8px;
+    padding-top: 10px;
+    font-size: 15px;
+
+    svg {
+      width: 18px;
+      height: 18px;
+    }
+  }
+`;
+
+export const EmptyBox = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 40px;
+  border: 3px dashed ${T.dashed};
+  border-radius: 16px;
+
+  strong {
+    font-size: 24px;
+    font-weight: 700;
+  }
+
+  p {
+    margin: 0;
+    font-size: 17px;
+    line-height: 1.5;
+    color: ${T.text2};
+  }
+
+  ${MOBILE} {
+    padding: 24px;
+
+    strong {
+      font-size: 20px;
+    }
+  }
+`;
+
+export const PrimaryButton = styled.button`
+  ${resetButton}
+  margin-top: 8px;
+  height: 48px;
+  padding: 0 22px;
+  border-radius: 12px;
+  background: ${T.navy};
+  color: #fff;
+  font-size: 17px;
+  font-weight: 700;
+
+  &:hover {
+    background: #2a3577;
+  }
+`;
+
+export const StatusBox = styled.div`
+  display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: #999;
-  font-size: 18px;
   flex: 1;
-  min-height: 300px;
+  gap: 16px;
+  padding: 40px 16px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 600;
+  color: ${T.meta};
 `;
 
+// Usado também pela página de avaliações
 export const LoadingContent = styled.div`
   display: flex;
   align-items: center;
@@ -359,28 +826,4 @@ export const LoadingContent = styled.div`
   min-height: 600px;
   font-size: 18px;
   color: #666;
-`;
-
-export const ErrorBox = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-  color: #fff;
-  text-align: center;
-
-  button {
-    padding: 12px 24px;
-    border: none;
-    border-radius: 6px;
-    background-color: #fff;
-    color: #141e53;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-
-    &:hover {
-      opacity: 0.85;
-    }
-  }
 `;

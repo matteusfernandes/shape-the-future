@@ -4,9 +4,25 @@ export const BLOCK2 = ['10:15', '10:30', '10:45', '11:00', '11:15'];
 // Sessões de apresentação: cada uma tem uma cor fixa da paleta do projeto,
 // usada no seletor, no aviso e nos cards do cronograma
 export const SESSIONS = [
-  { id: 1, label: 'Sessão 1', schedules: BLOCK1, color: '#55B47A', soft: '#E8F5EC' },
-  { id: 2, label: 'Sessão 2', schedules: BLOCK2, color: '#EC72A1', soft: '#FDEAF2' }
+  {
+    id: 1,
+    label: 'Sessão 1',
+    schedules: BLOCK1,
+    color: '#55B47A',
+    soft: '#E8F5EC'
+  },
+  {
+    id: 2,
+    label: 'Sessão 2',
+    schedules: BLOCK2,
+    color: '#EC72A1',
+    soft: '#FDEAF2'
+  }
 ];
+
+// Data do evento (AAAA-MM-DD). No dia, o cronograma destaca o que está
+// acontecendo "agora"; sem ela, esse destaque fica desligado.
+export const EVENT_DATE = process.env.NEXT_PUBLIC_EVENT_DATE ?? '';
 
 export const getSession = (id: number) =>
   SESSIONS.find((session) => session.id === id) ?? SESSIONS[0];

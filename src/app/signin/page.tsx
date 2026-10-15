@@ -10,7 +10,7 @@ import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
 
 import { Container, Content } from './style';
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import _ from 'lodash';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
@@ -36,6 +36,20 @@ export default function SignIn() {
     resolver: yupResolver(schema)
   });
   const { push } = useRouter();
+
+  // Redirecionado pelo http.ts quando o token do backend expira
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('sessao') === 'expirada') {
+        toast.info('Sua sessão expirou. Entre novamente.', {
+          toastId: 'sessao-expirada'
+        });
+      }
+    } catch {
+      // ignora
+    }
+  }, []);
 
   const onSubmit = useCallback(
     async (data: Inputs) => {

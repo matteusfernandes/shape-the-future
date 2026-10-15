@@ -7,8 +7,13 @@ export const BACKEND_TOKEN_TTL_SECONDS = 24 * 60 * 60;
 
 export const SESSION_EXPIRED_URL = '/signin?sessao=expirada';
 
+// No navegador as chamadas passam pelo próprio domínio do site (/backend,
+// repassado para a API em next.config.js); no servidor vão direto para a API
+export const API_BASE_URL =
+  typeof window === 'undefined' ? process.env.NEXT_PUBLIC_API : '/backend/';
+
 const http = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API
+  baseURL: API_BASE_URL
 });
 
 http.interceptors.request.use(async (config) => {

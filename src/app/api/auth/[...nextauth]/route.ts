@@ -5,7 +5,7 @@ import _ from 'lodash';
 import NextAuth, { AuthOptions, User } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 
-import { http } from '@/lib/http';
+import { BACKEND_TOKEN_TTL_SECONDS, http } from '@/lib/http';
 
 export const authOptions: AuthOptions = {
   providers: [
@@ -34,6 +34,11 @@ export const authOptions: AuthOptions = {
   ],
   pages: {
     signIn: '/signin'
+  },
+  // A sessão do site dura o mesmo que o token do backend; sem isso o usuário
+  // continuava logado por 30 dias com um token já expirado
+  session: {
+    maxAge: BACKEND_TOKEN_TTL_SECONDS
   },
   callbacks: {
     async jwt({ token, user }) {

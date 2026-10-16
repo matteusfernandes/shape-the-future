@@ -13,6 +13,7 @@ import {
   WrapperContent
 } from './style';
 import { toast } from 'react-toastify';
+import { AxiosError } from 'axios';
 import Link from 'next/link';
 import { useRole } from '@/hooks/useRole';
 
@@ -30,9 +31,17 @@ export default function Dashboard() {
 
   const handleRemoveSpace = useCallback(
     async (space: Space) => {
-      await http.delete(`/spaces/${space.id}`);
-      toast.success(`${space.name} - removido com sucesso!`);
-      handleGetSpace();
+      try {
+        await http.delete(`/spaces/${space.id}`);
+        toast.success(`${space.name} - removido com sucesso!`);
+        handleGetSpace();
+      } catch (error) {
+        // Ex.: espaço com projetos ou usuários vinculados
+        toast.error(
+          (error as AxiosError<{ message?: string }>)?.response?.data
+            ?.message ?? 'Não foi possível excluir o espaço'
+        );
+      }
     },
     [handleGetSpace]
   );

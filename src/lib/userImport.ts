@@ -58,7 +58,7 @@ export function downloadUsersTemplate(spaces: Space[]) {
       ],
       ['2. Não altere os nomes das colunas da linha 1.'],
       [
-        '3. Usuário e Senha: de 3 a 30 letras ou números, sem espaços ou acentos.'
+        '3. Usuário e Senha: até 100 caracteres, sem espaço no início ou no fim.'
       ],
       ['4. Função: Jurado, Staff, Admin ou Sigma.'],
       ['5. Espaço: obrigatório para jurados. Use um nome da aba "Espaços".'],
@@ -150,13 +150,11 @@ export function validateUserDrafts(
       const name = draft.username.trim().toUpperCase();
 
       if (!CREDENTIAL_PATTERN.test(draft.username.trim())) {
-        errors.push(
-          'Usuário deve ter de 3 a 30 letras ou números, sem espaços ou acentos.'
-        );
+        errors.push('Informe o usuário (até 100 caracteres).');
       }
       if (!CREDENTIAL_PATTERN.test(draft.password.trim())) {
         errors.push(
-          'Senha deve ter de 3 a 30 letras ou números, sem espaços ou acentos.'
+          'Informe a senha (até 100 caracteres, sem espaço no início ou no fim).'
         );
       }
       if (!draft.role) errors.push('Selecione a função.');

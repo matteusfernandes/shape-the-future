@@ -78,7 +78,9 @@ export default function SigmaAccess() {
     const edit = editOf(user);
 
     if (edit.password && !CREDENTIAL_PATTERN.test(edit.password)) {
-      toast.error('A senha deve ter de 3 a 30 letras ou números.');
+      toast.error(
+        'A senha deve ter até 100 caracteres, sem espaço no início ou no fim.'
+      );
       return;
     }
 

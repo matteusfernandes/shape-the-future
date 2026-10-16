@@ -45,6 +45,8 @@ export default function EvaluationParticipants({
 }: EvaluationParticipantsProps) {
   const router = useRouter();
   const { data: session } = useSession();
+  // Trava o botão durante o envio para evitar avaliação duplicada
+  const [submitting, setSubmitting] = useState(false);
   const [evaluation, setEvaluation] = useState<EvaluationInput>({
     reqIdentify: {
       option: null,
@@ -69,6 +71,10 @@ export default function EvaluationParticipants({
   });
 
   const handleEvaluationFinish = useCallback(async () => {
+    if (submitting) return;
+
+    setSubmitting(true);
+
     try {
       await http.post('/evaluation', {
         projectId: _.toNumber(searchParams.id),
@@ -81,9 +87,13 @@ export default function EvaluationParticipants({
       toast.success('Avaliação adicionada');
       router.push('/');
     } catch (error: any) {
-      toast.error(error?.response?.data?.message);
+      toast.error(
+        error?.response?.data?.message ?? 'Não foi possível enviar a nota'
+      );
+      setSubmitting(false);
     }
   }, [
+    submitting,
     evaluation.reqCommunication.total,
     evaluation.reqCreation.total,
     evaluation.reqIdentify.total,
@@ -660,9 +670,10 @@ export default function EvaluationParticipants({
 
         <Cell padding="0">
           <Button
-            label="enviar nota"
+            label={submitting ? 'enviando...' : 'enviar nota'}
             full
             disabled={
+              submitting ||
               !(
                 evaluation.reqCommunication.option !== null &&
                 evaluation.reqCreation.option !== null &&

@@ -1,6 +1,8 @@
 'use client';
 import { useCallback, useState } from 'react';
 import { useSession } from 'next-auth/react';
+import { AxiosError } from 'axios';
+import { PUBLIC_VOTE_COOLDOWN_SECONDS } from '@/constants';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
 import { http } from '@/lib/http';
@@ -16,6 +18,34 @@ import {
   Select
 } from './style';
 import { FinalistsItemProps } from '.';
+
+const LAST_VOTE_KEY = 'stf:ultimo-voto-popular';
+
+// Segundos que faltam para este navegador poder votar de novo
+const secondsToVoteAgain = () => {
+  try {
+    const last = Number(localStorage.getItem(LAST_VOTE_KEY));
+    const wait = Math.ceil(
+      (last + PUBLIC_VOTE_COOLDOWN_SECONDS * 1000 - Date.now()) / 1000
+    );
+    return last && wait > 0 ? wait : 0;
+  } catch {
+    return 0;
+  }
+};
+
+const rememberVote = () => {
+  try {
+    localStorage.setItem(LAST_VOTE_KEY, String(Date.now()));
+  } catch {
+    // sem localStorage: o servidor aplica o intervalo mesmo assim
+  }
+};
+
+// Mensagem enviada pela API (ex.: "A votação não está aberta.")
+const apiMessage = (error: unknown, fallback: string) =>
+  (error as AxiosError<{ message?: string }>)?.response?.data?.message ??
+  fallback;
 
 export function FinalistsItem({
   background,
@@ -66,28 +96,43 @@ export function FinalistsItem({
   const handlePublicVote = useCallback(async () => {
     if (isVoting) return; // Impede múltiplos cliques enquanto "isVoting" é true
 
+    const wait = secondsToVoteAgain();
+    if (wait) {
+      toast.info(`Voto registrado! Aguarde ${wait}s para votar novamente.`, {
+        toastId: 'intervalo-voto'
+      });
+      return;
+    }
+
     setIsVoting(true);
     try {
       await http.post(`/vote/public`, {
         projectId: project?.id
       });
+      rememberVote();
       toast.success('Voto computado');
       router.push('/');
     } catch (error) {
-      toast.error('Votação ainda não foi iniciada');
+      toast.error(apiMessage(error, 'Não foi possível registrar o voto'));
+      setIsVoting(false);
     }
   }, [project?.id, router, isVoting]);
 
   const handleJudgeVote = useCallback(async () => {
+    if (isVoting) return; // Evita voto duplicado com cliques repetidos
+
+    setIsVoting(true);
     try {
       await http.post(`/vote/judge`, {
         projectId: project?.id
       });
       toast.success('Voto computado');
     } catch (error) {
-      toast.error('Você já votou');
+      toast.error(apiMessage(error, 'Não foi possível registrar o voto'));
+    } finally {
+      setIsVoting(false);
     }
-  }, [project]);
+  }, [project, isVoting]);
 
   return (
     <Container
@@ -133,8 +178,9 @@ export function FinalistsItem({
 
       {!horizontal && isVote && (
         <Button
-          label="Votar"
+          label={isVoting ? 'Enviando...' : 'Votar'}
           borderless
+          disabled={isVoting}
           onClick={
             session?.user.role === 'judge' ? handleJudgeVote : handlePublicVote
           }

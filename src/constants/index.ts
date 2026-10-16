@@ -58,8 +58,14 @@ export const USER_ROLES = [
   { value: 'sigma', label: 'Sigma' }
 ];
 
-// Mesma regra do login no backend: letras e números, de 3 a 30 caracteres
-export const CREDENTIAL_PATTERN = /^[a-zA-Z0-9]{3,30}$/;
+// Mesma regra do login no backend: até 100 caracteres de qualquer tipo
+// (há usuários com ponto e espaço), sem espaço no início ou no fim
+export const CREDENTIAL_PATTERN = /^\S(?:.{0,98}\S)?$/;
+
+// Intervalo entre votos populares do mesmo navegador (anti-spam). O servidor
+// aplica o mesmo intervalo (PUBLIC_VOTE_COOLDOWN_SECONDS no backend).
+export const PUBLIC_VOTE_COOLDOWN_SECONDS =
+  Number(process.env.NEXT_PUBLIC_PUBLIC_VOTE_COOLDOWN_SECONDS) || 60;
 
 // Mesmas cores dos badges da listagem de usuários
 export const ROLE_BADGES: Record<

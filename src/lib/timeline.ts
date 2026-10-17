@@ -21,9 +21,6 @@ export const TIMELINE_SESSIONS = SESSIONS.map((session) => ({
 export const sessionOf = (start: number) =>
   start >= TIMELINE_SESSIONS[1].start ? 1 : 0;
 
-export const plural = (count: number) =>
-  `${count} apresentaç${count === 1 ? 'ão' : 'ões'}`;
-
 export const joinNames = (names: string[]) =>
   names.length < 2
     ? names.join('')
@@ -171,21 +168,14 @@ export const matchesQuery = (entry: TimelineEntry, query: string) =>
 
 export type Filters = { query: string; session: number; spaceId: number };
 
-// Busca ∩ sessão ∩ espaço. `bySession` ignora o espaço e alimenta os
-// contadores do filtro "Onde?"
+// Busca ∩ sessão ∩ espaço
 export function applyFilters(entries: TimelineEntry[], filters: Filters) {
-  const bySession = entries.filter(
+  const shown = entries.filter(
     (entry) =>
       matchesQuery(entry, filters.query) &&
-      (filters.session === ALL || entry.session === filters.session)
-  );
-  const shown = bySession.filter(
-    (entry) => filters.spaceId === ALL || entry.spaceId === filters.spaceId
+      (filters.session === ALL || entry.session === filters.session) &&
+      (filters.spaceId === ALL || entry.spaceId === filters.spaceId)
   );
 
-  return { bySession, shown };
+  return { shown };
 }
-
-export const countInSpace = (entries: TimelineEntry[], spaceId: number) =>
-  entries.filter((entry) => spaceId === ALL || entry.spaceId === spaceId)
-    .length;

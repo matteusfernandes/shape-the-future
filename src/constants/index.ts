@@ -20,10 +20,6 @@ export const SESSIONS = [
   }
 ];
 
-// Data do evento (AAAA-MM-DD). No dia, o cronograma destaca o que está
-// acontecendo "agora"; sem ela, esse destaque fica desligado.
-export const EVENT_DATE = process.env.NEXT_PUBLIC_EVENT_DATE ?? '';
-
 export const getSession = (id: number) =>
   SESSIONS.find((session) => session.id === id) ?? SESSIONS[0];
 

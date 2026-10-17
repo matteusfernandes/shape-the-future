@@ -1,33 +1,20 @@
-import { SESSIONS, sessionRange } from '@/constants';
+import { SESSIONS } from '@/constants';
 import { normalizeText } from '@/lib/text';
 import type { Timeline } from '@/app/timeline/timelines';
-
-// Cada apresentação ocupa 15 minutos
-export const SLOT_MINUTES = 15;
 
 export const toMinutes = (time: string) => {
   const [hours, minutes] = time.split(':').map(Number);
   return hours * 60 + (minutes || 0);
 };
 
-export const formatMinutes = (total: number) =>
-  `${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}`;
-
-// "Sessão 1" e "Sessão 2", com as mesmas cores e horários do resto do sistema
+// "Sessão 1" e "Sessão 2", com as mesmas cores do resto do sistema. Os
+// horários não são exibidos no cronograma; servem só para ordenar e separar
+// as sessões
 export const TIMELINE_SESSIONS = SESSIONS.map((session) => ({
   label: session.label,
   color: session.color,
-  range: sessionRange(session.schedules),
   start: toMinutes(session.schedules[0])
 }));
-
-export const DAY_RANGE = `${SESSIONS[0].schedules[0]} às ${
-  SESSIONS[SESSIONS.length - 1].schedules.slice(-1)[0]
-}`;
-
-export const INTERVAL_RANGE = `${SESSIONS[0].schedules.slice(-1)[0]} às ${
-  SESSIONS[1].schedules[0]
-}`;
 
 // Classifica pelo horário de início para que nenhum projeto fique de fora,
 // mesmo os cadastrados fora dos horários previstos de cada sessão
@@ -121,7 +108,6 @@ export type TimelineEntry = {
   id: number;
   spaceId: number;
   spaceName: string;
-  schedule: string;
   start: number;
   session: number;
   title: string;
@@ -146,7 +132,6 @@ export function buildEntries(spaces: Timeline[]) {
         id: project.id,
         spaceId: space.id,
         spaceName: formatName(space.name),
-        schedule: formatMinutes(start),
         start,
         session: sessionOf(start),
         title: formatSentence(project.title),
@@ -204,34 +189,3 @@ export function applyFilters(entries: TimelineEntry[], filters: Filters) {
 export const countInSpace = (entries: TimelineEntry[], spaceId: number) =>
   entries.filter((entry) => spaceId === ALL || entry.spaceId === spaceId)
     .length;
-
-export type Slot = {
-  start: number;
-  time: string;
-  until: string;
-  entries: TimelineEntry[];
-};
-
-// Agrupa por horário; só aparecem horários que têm apresentações
-export function groupSlots(entries: TimelineEntry[]): Slot[] {
-  const slots = new Map<number, TimelineEntry[]>();
-
-  entries.forEach((entry) => {
-    slots.set(entry.start, [...(slots.get(entry.start) ?? []), entry]);
-  });
-
-  return Array.from(slots.entries())
-    .sort(([a], [b]) => a - b)
-    .map(([start, list]) => ({
-      start,
-      time: formatMinutes(start),
-      until: formatMinutes(start + SLOT_MINUTES),
-      entries: list
-    }));
-}
-
-export const isNowSlot = (start: number, now: number | null) =>
-  now !== null && now >= start && now < start + SLOT_MINUTES;
-
-export const isPastSlot = (start: number, now: number | null) =>
-  now !== null && now >= start + SLOT_MINUTES;

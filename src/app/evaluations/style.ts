@@ -2,7 +2,13 @@
 
 import styled from 'styled-components';
 
-export const Container = styled.div``;
+// Ocupa toda a altura do quadro do site; os projetos esticam para preenchê-lo
+// mesmo quando a sessão tem poucos alunos por projeto
+export const Container = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+`;
 
 export const WrapperButton = styled.div`
   width: 100%;
@@ -28,6 +34,7 @@ export const Button = styled.button`
 `;
 
 export const Content = styled.div`
+  flex: 1;
   display: flex;
   flex-flow: column nowrap;
   overflow: hidden;

@@ -53,12 +53,8 @@ export type EvaluationProgress = {
 };
 
 export type Consistency = {
-  scheduleConflicts: {
-    spaceId: number;
-    spaceName: string | null;
-    schedule: string;
-    projects: ProjectRef[];
-  }[];
+  duplicateProjects: { title: string; projects: ProjectRef[] }[];
+  studentsInManyProjects: { name: string; projects: ProjectRef[] }[];
   spacesWithoutJudges: { id: number; name: string; projects: number }[];
   projectsWithoutStudents: ProjectRef[];
   judgesWithoutSpace: { id: number; username: string }[];

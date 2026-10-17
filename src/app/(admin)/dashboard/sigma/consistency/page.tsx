@@ -82,7 +82,13 @@ export default function SigmaConsistency() {
   const load = useCallback(async () => {
     try {
       const { data } = await http.get<Consistency>('/sigma/consistency');
-      setData(data);
+      // Seções novas com valor padrão: a página funciona mesmo enquanto o
+      // backend ainda não foi atualizado
+      setData({
+        ...data,
+        duplicateProjects: data.duplicateProjects ?? [],
+        studentsInManyProjects: data.studentsInManyProjects ?? []
+      });
     } catch {
       toast.error('Não foi possível carregar a checagem');
     }
@@ -93,7 +99,8 @@ export default function SigmaConsistency() {
   }, [load]);
 
   const problems = data
-    ? data.scheduleConflicts.length +
+    ? data.duplicateProjects.length +
+      data.studentsInManyProjects.length +
       data.spacesWithoutJudges.length +
       data.projectsWithoutStudents.length +
       data.judgesWithoutSpace.length
@@ -125,28 +132,60 @@ export default function SigmaConsistency() {
           </Panel>
 
           <Section
-            icon="⏰"
-            title="Projetos no mesmo espaço e horário"
-            description="Dois ou mais projetos apresentando no mesmo lugar, ao mesmo tempo."
-            count={data.scheduleConflicts.length}
+            icon="📑"
+            title="Projetos cadastrados mais de uma vez"
+            description="Mesmo título e subtítulo em mais de um cadastro: aparecem repetidos no cronograma e as notas se dividem. Exclua as cópias antes das avaliações."
+            count={data.duplicateProjects.length}
             severity="error"
           >
-            {data.scheduleConflicts.map((conflict) => (
+            {data.duplicateProjects.map((group) => (
               <ListItem
-                key={`${conflict.spaceId}-${conflict.schedule}`}
+                key={group.title}
                 $accent={COLORS.danger}
                 style={{ flexDirection: 'column', alignItems: 'stretch' }}
               >
-                <strong>
-                  📍 {conflict.spaceName ?? 'Sem espaço'} · ⏰{' '}
-                  {conflict.schedule}
-                </strong>
-                {conflict.projects.map((project) => (
+                <strong>{group.title}</strong>
+                {group.projects.map((project) => (
                   <ButtonRow
                     key={project.id}
                     style={{ justifyContent: 'space-between' }}
                   >
-                    <span>{project.title}</span>
+                    <span>
+                      id {project.id} · 📍 {project.spaceName ?? 'Sem espaço'}
+                    </span>
+                    <EditLink
+                      href={`/dashboard/projects/${project.id}`}
+                      title="Editar projeto"
+                    />
+                  </ButtonRow>
+                ))}
+              </ListItem>
+            ))}
+          </Section>
+
+          <Section
+            icon="🧑‍🎓"
+            title="Alunos em mais de um projeto"
+            description="O mesmo aluno cadastrado em projetos diferentes (geralmente cadastro repetido)."
+            count={data.studentsInManyProjects.length}
+            severity="error"
+          >
+            {data.studentsInManyProjects.map((student) => (
+              <ListItem
+                key={student.name}
+                $accent={COLORS.danger}
+                style={{ flexDirection: 'column', alignItems: 'stretch' }}
+              >
+                <strong>{student.name}</strong>
+                {student.projects.map((project) => (
+                  <ButtonRow
+                    key={project.id}
+                    style={{ justifyContent: 'space-between' }}
+                  >
+                    <span>
+                      {project.title} (id {project.id}) · 📍{' '}
+                      {project.spaceName ?? 'Sem espaço'}
+                    </span>
                     <EditLink
                       href={`/dashboard/projects/${project.id}`}
                       title="Editar projeto"

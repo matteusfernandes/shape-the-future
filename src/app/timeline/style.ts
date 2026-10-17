@@ -18,7 +18,6 @@ const T = {
   text2: '#4a5280',
   meta: '#5a6699',
   placeholder: '#7a80a8',
-  now: '#55B47A',
   focus: '#EC72A1'
 };
 
@@ -265,45 +264,6 @@ export const Dot = styled.span<{ $color: string }>`
   }
 `;
 
-export const SessionRange = styled.span`
-  font-size: 14px;
-  font-weight: 500;
-
-  ${MOBILE} {
-    font-size: 12px;
-  }
-`;
-
-export const NowBanner = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 18px;
-  font-weight: 600;
-
-  ${MOBILE} {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 6px;
-    font-size: 15px;
-  }
-`;
-
-export const NowPill = styled.span<{ $small?: boolean }>`
-  flex: none;
-  padding: ${({ $small }) => ($small ? '5px 12px' : '6px 12px')};
-  border-radius: 999px;
-  background: ${T.now};
-  color: ${T.navy};
-  font-size: 14px;
-  font-weight: 800;
-
-  ${MOBILE} {
-    padding: ${({ $small }) => ($small ? '4px 10px' : '5px 10px')};
-    font-size: ${({ $small }) => ($small ? '12px' : '13px')};
-  }
-`;
-
 /* ---------- 2. Filtro de espaços ---------- */
 
 export const SpaceBar = styled.div`
@@ -480,6 +440,7 @@ export const Interval = styled.div`
 export const SessionBody = styled.div`
   display: flex;
   flex-direction: column;
+  gap: 20px;
 
   ${MOBILE} {
     gap: 14px;
@@ -502,11 +463,6 @@ export const SessionHeader = styled.h2<{ $color: string }>`
     font-weight: 800;
   }
 
-  .range {
-    font-size: 20px;
-    font-weight: 600;
-  }
-
   .count {
     margin-left: auto;
     font-size: 17px;
@@ -521,10 +477,6 @@ export const SessionHeader = styled.h2<{ $color: string }>`
 
     .label {
       font-size: 21px;
-    }
-
-    .range {
-      font-size: 16px;
     }
 
     .count {
@@ -545,81 +497,6 @@ export const SessionEmpty = styled.p`
   }
 `;
 
-export const SlotRow = styled.div<{ $past: boolean }>`
-  display: grid;
-  grid-template-columns: 150px minmax(0, 1fr);
-  gap: 28px;
-  padding: 24px 0;
-  border-bottom: 2px solid ${T.border};
-  opacity: ${({ $past }) => ($past ? 0.5 : 1)};
-
-  ${MOBILE} {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    padding: 0;
-    border-bottom: none;
-  }
-`;
-
-export const SlotTime = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-
-  .time {
-    font-size: 40px;
-    font-weight: 800;
-    line-height: 1;
-    letter-spacing: -0.02em;
-  }
-
-  .until {
-    font-size: 16px;
-    font-weight: 500;
-    color: ${T.meta};
-  }
-
-  .past {
-    margin-top: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    color: ${T.meta};
-  }
-
-  ${NowPill} {
-    align-self: flex-start;
-    margin-top: 8px;
-  }
-
-  ${MOBILE} {
-    flex-direction: row;
-    align-items: baseline;
-    flex-wrap: wrap;
-    gap: 10px;
-
-    .time {
-      font-size: 30px;
-      letter-spacing: normal;
-    }
-
-    .until {
-      font-size: 15px;
-      font-weight: 400;
-    }
-
-    .past {
-      margin-top: 0;
-      font-size: 13px;
-    }
-
-    ${NowPill} {
-      align-self: auto;
-      margin-top: 0;
-    }
-  }
-`;
-
 export const Cards = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -631,13 +508,13 @@ export const Cards = styled.div`
   }
 `;
 
-export const Card = styled.article<{ $now: boolean }>`
+export const Card = styled.article`
   display: flex;
   flex-direction: column;
   gap: 12px;
   padding: 20px 22px;
   background: #fff;
-  border: 2px solid ${({ $now }) => ($now ? T.navy : T.border)};
+  border: 2px solid ${T.border};
   border-radius: 16px;
 
   ${MOBILE} {

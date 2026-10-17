@@ -67,8 +67,7 @@ export function FinalistsItem({
   const handleNavigate = useCallback(() => {
     const urlParams = new URLSearchParams({
       id: project!.id.toString(),
-      title: project!.title,
-      schedule: project!.schedule
+      title: project!.title
     });
 
     router.push(`/evaluations/participant?${urlParams}`);
@@ -145,7 +144,8 @@ export function FinalistsItem({
         evaluation={evaluation}
       >
         {horizontal ? (
-          <Info horizontal>{schedule}H</Info>
+          // Na avaliação dos jurados os horários não são exibidos
+          !evaluation && <Info horizontal>{schedule}H</Info>
         ) : (
           <Info>Grupo {group ? group + 1 : null}</Info>
         )}

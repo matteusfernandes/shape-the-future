@@ -17,14 +17,6 @@ export const Container = styled.div<{ $colored?: boolean }>`
     `}
 `;
 
-export const Range = styled.span`
-  display: block;
-  margin-top: 4px;
-  font-size: 0.75em;
-  font-weight: 500;
-  opacity: 0.85;
-`;
-
 type DayButtonProps = { $active?: boolean; $color?: string };
 
 export const DayButton = styled.button<DayButtonProps>`

@@ -26,7 +26,6 @@ import { useSession } from 'next-auth/react';
 type EvaluationParticipantsProps = {
   searchParams: {
     id: string;
-    schedule: string;
     title: string;
   };
 };
@@ -141,7 +140,6 @@ export default function EvaluationParticipants({
       <Row>
         <WrapperInfo noBorder mobile>
           <Info>{searchParams.title}</Info>
-          <Info>{searchParams.schedule}H</Info>
         </WrapperInfo>
       </Row>
 
@@ -660,9 +658,8 @@ export default function EvaluationParticipants({
       </Row>
 
       <Row space>
-        <WrapperInfo noBorder mobileHidden>
-          <Info>{searchParams.schedule}H</Info>
-        </WrapperInfo>
+        {/* Célula mantida vazia para alinhar com a rubrica (sem horário) */}
+        <WrapperInfo noBorder mobileHidden />
 
         <Cell padding="10px 0" mobileHidden>
           <Info>{searchParams.title}</Info>

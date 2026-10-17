@@ -3,17 +3,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useTimeline } from '@/hooks/useTimeline';
-import { useNow } from '@/hooks/useNow';
 import {
   ALL,
-  DAY_RANGE,
-  INTERVAL_RANGE,
   TIMELINE_SESSIONS,
   buildEntries,
-  formatMinutes,
-  groupSlots,
-  isNowSlot,
-  isPastSlot,
   applyFilters,
   countInSpace,
   plural
@@ -35,8 +28,6 @@ import {
   Interval,
   Kicker,
   Main,
-  NowBanner,
-  NowPill,
   Page,
   People,
   PrimaryButton,
@@ -48,11 +39,8 @@ import {
   SessionGroup,
   SessionHeader,
   SessionLabel,
-  SessionRange,
   SessionSwitch,
   ShowAllLink,
-  SlotRow,
-  SlotTime,
   SpaceBar,
   SpaceCount,
   SpaceLabel,
@@ -70,14 +58,12 @@ const SESSION_OPTIONS = [
     value: ALL,
     label: 'Dia todo',
     short: 'Tudo',
-    range: DAY_RANGE,
     dot: '#fff'
   },
   ...TIMELINE_SESSIONS.map((session, index) => ({
     value: index,
     label: session.label,
     short: session.label,
-    range: session.range,
     dot: session.color
   }))
 ];
@@ -122,15 +108,10 @@ export default function Timeline() {
   const [query, setQuery] = useState('');
   const [session, setSession] = useState(ALL);
   const [spaceId, setSpaceId] = useState(ALL);
-  const [simulated, setSimulated] = useState<string | null>(null);
 
   useEffect(() => {
     setQuery(readParam('q') ?? '');
-    // ?agora=9:20 simula um horário para testar o destaque em tempo real
-    setSimulated(readParam('agora'));
   }, []);
-
-  const now = useNow(simulated);
 
   const changeQuery = useCallback((value: string) => {
     setQuery(value);
@@ -156,8 +137,6 @@ export default function Timeline() {
   const trimmed = query.trim();
   const anyFilter = !!trimmed || session !== ALL || spaceId !== ALL;
 
-  const happeningNow = shown.filter((entry) => isNowSlot(entry.start, now));
-
   if (error) {
     return (
       <Page>
@@ -176,7 +155,7 @@ export default function Timeline() {
       <Hero>
         <HeroHeading>
           <Kicker>CRONOGRAMA</Kicker>
-          <HeroTitle>Encontre seu horário e sua sala</HeroTitle>
+          <HeroTitle>Encontre sua sessão e sua sala</HeroTitle>
         </HeroHeading>
 
         <HeroRow>
@@ -214,22 +193,10 @@ export default function Timeline() {
                   <span className="long">{option.label}</span>
                   <span className="short">{option.short}</span>
                 </SessionLabel>
-                <SessionRange>{option.range}</SessionRange>
               </SessionButton>
             ))}
           </SessionSwitch>
         </HeroRow>
-
-        {now !== null ? (
-          <NowBanner>
-            <NowPill>AGORA {formatMinutes(now)}</NowPill>
-            {happeningNow.length
-              ? `${plural(
-                  happeningNow.length
-                )} acontecendo neste momento, destacadas abaixo.`
-              : 'Nenhuma apresentação neste exato horário.'}
-          </NowBanner>
-        ) : null}
       </Hero>
 
       <SpaceBar>
@@ -284,75 +251,50 @@ export default function Timeline() {
 
                   return (
                     <SessionGroup key={item.label}>
-                      {position > 0 ? (
-                        <Interval>
-                          {isMobile
-                            ? `Intervalo ${INTERVAL_RANGE}`
-                            : `Intervalo · ${INTERVAL_RANGE}`}
-                        </Interval>
-                      ) : null}
+                      {position > 0 ? <Interval>Intervalo</Interval> : null}
 
                       <SessionBody>
                         <SessionHeader $color={item.color}>
                           <span className="label">{item.label}</span>
-                          <span className="range">{item.range}</span>
                           <span className="count">
                             {plural(sessionEntries.length)}
                           </span>
                         </SessionHeader>
 
-                        {groupSlots(sessionEntries).map((slot) => {
-                          const current = isNowSlot(slot.start, now);
-                          const past = isPastSlot(slot.start, now);
+                        {sessionEntries.length ? (
+                          <Cards>
+                            {sessionEntries.map((entry) => (
+                              <Card key={entry.id}>
+                                <Tags>
+                                  <SpaceTag>
+                                    <MapPinIcon size={18} />
+                                    {entry.spaceName}
+                                  </SpaceTag>
+                                  {entry.finalist ? (
+                                    <FinalistTag>
+                                      <StarIcon size={16} />
+                                      Finalista
+                                    </FinalistTag>
+                                  ) : null}
+                                </Tags>
 
-                          return (
-                            <SlotRow key={slot.start} $past={past}>
-                              <SlotTime>
-                                <span className="time">{slot.time}</span>
-                                <span className="until">até {slot.until}</span>
-                                {current ? (
-                                  <NowPill $small>AGORA</NowPill>
+                                <CardText>
+                                  <h3>{entry.title}</h3>
+                                  {entry.subtitle ? (
+                                    <p>{entry.subtitle}</p>
+                                  ) : null}
+                                </CardText>
+
+                                {entry.people ? (
+                                  <People>
+                                    <UsersIcon size={20} />
+                                    {entry.people}
+                                  </People>
                                 ) : null}
-                                {past ? (
-                                  <span className="past">Já passou</span>
-                                ) : null}
-                              </SlotTime>
-
-                              <Cards>
-                                {slot.entries.map((entry) => (
-                                  <Card key={entry.id} $now={current}>
-                                    <Tags>
-                                      <SpaceTag>
-                                        <MapPinIcon size={18} />
-                                        {entry.spaceName}
-                                      </SpaceTag>
-                                      {entry.finalist ? (
-                                        <FinalistTag>
-                                          <StarIcon size={16} />
-                                          Finalista
-                                        </FinalistTag>
-                                      ) : null}
-                                    </Tags>
-
-                                    <CardText>
-                                      <h3>{entry.title}</h3>
-                                      {entry.subtitle ? (
-                                        <p>{entry.subtitle}</p>
-                                      ) : null}
-                                    </CardText>
-
-                                    {entry.people ? (
-                                      <People>
-                                        <UsersIcon size={20} />
-                                        {entry.people}
-                                      </People>
-                                    ) : null}
-                                  </Card>
-                                ))}
-                              </Cards>
-                            </SlotRow>
-                          );
-                        })}
+                              </Card>
+                            ))}
+                          </Cards>
+                        ) : null}
 
                         {!sessionEntries.length ? (
                           <SessionEmpty>

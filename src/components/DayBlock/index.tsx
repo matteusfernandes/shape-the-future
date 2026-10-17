@@ -1,8 +1,8 @@
 'use client';
 
-import { SESSIONS, sessionRange } from '@/constants';
+import { SESSIONS } from '@/constants';
 
-import { Container, DayButton, Range } from './style';
+import { Container, DayButton } from './style';
 
 type DayBlockProps = {
   block: number;
@@ -26,7 +26,6 @@ export function DayBlock({ block, setBlock, colored, counts }: DayBlockProps) {
         >
           {session.label}
           {counts ? ` (${counts[session.id] ?? 0})` : ''}
-          <Range>{sessionRange(session.schedules)}</Range>
         </DayButton>
       ))}
     </Container>

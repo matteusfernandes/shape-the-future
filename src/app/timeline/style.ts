@@ -335,23 +335,6 @@ export const SpacePill = styled.button<{ $active: boolean }>`
   }
 `;
 
-export const SpaceCount = styled.span<{ $active: boolean }>`
-  min-width: 26px;
-  padding: 2px 8px;
-  border-radius: 999px;
-  text-align: center;
-  font-size: 13px;
-  font-weight: 700;
-  color: ${T.navy};
-  background: ${({ $active }) => ($active ? '#fff' : T.tint)};
-
-  ${MOBILE} {
-    min-width: 0;
-    padding: 2px 7px;
-    font-size: 12px;
-  }
-`;
-
 /* ---------- 3. Lista ---------- */
 
 // Ocupa só o espaço restante do contêiner do site, sem altura mínima própria
@@ -463,12 +446,6 @@ export const SessionHeader = styled.h2<{ $color: string }>`
     font-weight: 800;
   }
 
-  .count {
-    margin-left: auto;
-    font-size: 17px;
-    font-weight: 700;
-  }
-
   ${MOBILE} {
     flex-wrap: wrap;
     gap: 4px 10px;
@@ -477,10 +454,6 @@ export const SessionHeader = styled.h2<{ $color: string }>`
 
     .label {
       font-size: 21px;
-    }
-
-    .count {
-      display: none;
     }
   }
 `;

@@ -7,9 +7,7 @@ import {
   ALL,
   TIMELINE_SESSIONS,
   buildEntries,
-  applyFilters,
-  countInSpace,
-  plural
+  applyFilters
 } from '@/lib/timeline';
 
 import { MapPinIcon, SearchIcon, StarIcon, UsersIcon } from './icons';
@@ -42,7 +40,6 @@ import {
   SessionSwitch,
   ShowAllLink,
   SpaceBar,
-  SpaceCount,
   SpaceLabel,
   SpacePill,
   SpacePills,
@@ -126,7 +123,7 @@ export default function Timeline() {
 
   const { entries, spaces } = useMemo(() => buildEntries(data ?? []), [data]);
 
-  const { bySession, shown } = applyFilters(entries, {
+  const { shown } = applyFilters(entries, {
     query,
     session,
     spaceId
@@ -204,8 +201,6 @@ export default function Timeline() {
         <SpacePills role="group" aria-label="Espaço">
           {[{ id: ALL, name: 'Todos' }, ...spaces].map((space) => {
             const active = space.id === spaceId;
-            // O contador respeita busca e sessão, mas não o filtro de espaço
-            const count = countInSpace(bySession, space.id);
 
             return (
               <SpacePill
@@ -216,7 +211,6 @@ export default function Timeline() {
                 onClick={() => setSpaceId(space.id)}
               >
                 {space.name}
-                <SpaceCount $active={active}>{count}</SpaceCount>
               </SpacePill>
             );
           })}
@@ -230,9 +224,13 @@ export default function Timeline() {
           <>
             <SummaryRow>
               <Summary aria-live="polite">
+                {/* Sem quantidades: o público não precisa saber quantos
+                    projetos há em cada sala ou sessão */}
                 {trimmed
-                  ? `${plural(shown.length)} com "${trimmed}"${where}`
-                  : `${plural(shown.length)}${where}`}
+                  ? `Resultados para "${trimmed}"${where}`
+                  : spaceName
+                  ? `Apresentações em ${spaceName}`
+                  : 'Todas as apresentações'}
               </Summary>
               {anyFilter ? (
                 <ShowAllLink type="button" onClick={reset}>
@@ -256,9 +254,6 @@ export default function Timeline() {
                       <SessionBody>
                         <SessionHeader $color={item.color}>
                           <span className="label">{item.label}</span>
-                          <span className="count">
-                            {plural(sessionEntries.length)}
-                          </span>
                         </SessionHeader>
 
                         {sessionEntries.length ? (
